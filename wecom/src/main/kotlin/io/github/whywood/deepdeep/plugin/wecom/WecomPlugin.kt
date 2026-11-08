@@ -65,13 +65,11 @@ class WecomPlugin : DeepDeepPlugin {
             append("企业微信插件已连接")
             status.botId?.let { append("（Bot ID：$it）") }
             appendLine("。命令用法见 deepdeep-wecom 技能；发送、修改、删除前先 --dry-run 预览。")
-            append("需要重新授权时，提示用户打开企业微信插件页面点「重新授权」；不要自行运行 `auth init`，也不要读取或输出凭据文件。")
         }
     } else {
         val label = if (status.installed) "企业微信未连接" else "企业微信 CLI 未安装"
         buildString {
             appendLine("企业微信插件当前不可用或未连接：$label。")
-            appendLine("需要安装或更新 CLI、连接或重新授权时，提示用户打开企业微信插件页面操作，不要自行执行 `auth init`，也不要读取或输出凭据文件。")
             append("其余情况下如需使用企业微信能力，先向用户说明需要完成插件连接。")
         }
     }

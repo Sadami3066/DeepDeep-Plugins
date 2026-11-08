@@ -274,9 +274,6 @@ internal fun miCloudPromptBody(view: MiCloudSessionView?, capabilities: MiCloudC
         } else {
             appendLine("已开启：${enabled.joinToString("、")}。")
         }
-        appendLine("新建、修改或删除笔记与待办前必须先向用户确认，并说明会直接写入小米云账号。")
-        appendLine("遇到 401 或登录失效时提示用户在插件页面重新登录，不要反复重试请求。")
-        append("短信、联系人、录音只按用户要求读取。")
     }
 }
 
