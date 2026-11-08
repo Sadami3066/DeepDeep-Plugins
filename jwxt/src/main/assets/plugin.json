@@ -1,0 +1,41 @@
+{
+  "id": "io.github.whywood.deepdeep.plugin.jwxt",
+  "version": "1.0.0",
+  "apiLevel": 4,
+  "minHostVersion": "0.2.0",
+  "capabilities": [
+    "files",
+    "linux",
+    "secrets"
+  ],
+  "entryClass": "io.github.whywood.deepdeep.plugin.jwxt.JwxtPlugin",
+  "name": {
+    "default": "中山大学教务",
+    "zh": "中山大学教务",
+    "en": "SYSU Academic"
+  },
+  "summary": {
+    "default": "课表、成绩、考试、公告与请假",
+    "zh": "课表、成绩、考试、公告与请假",
+    "en": "Timetable, grades, exams, notices and leave"
+  },
+  "description": {
+    "default": "查询课表、成绩、学分、考试、公告、空闲教室与请假记录；账号密码只在插件页使用",
+    "zh": "查询课表、成绩、学分、考试、公告、空闲教室与请假记录；账号密码只在插件页使用",
+    "en": "Query the SYSU academic system from the Linux runtime with a Node.js CLI: timetable, grades, credits, exams, notices, free classrooms and leave records. Account credentials and sign-in are handled on the plugin page; the CLI installs itself on first use."
+  },
+  "icon": "asset:icon.png",
+  "ui": {
+    "apiLevel": 1
+  },
+  "provides": {
+    "tools": [],
+    "skills": [
+      "deepdeep-jwxt"
+    ],
+    "uiSlots": [],
+    "pages": [
+      "main"
+    ]
+  }
+}
