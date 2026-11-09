@@ -11,7 +11,7 @@ const session = require('../session');
 const lms = require('../lms');
 const { red, dim } = require('../style');
 
-const MFA_PATH = path.join(os.homedir(), '.config/jwxt/mfa.json');
+const MFA_PATH = path.join(os.homedir(), '.config/sysu/jwxt/mfa.json');
 
 const HELP = `sysu login                统一登录（账密 + 企业微信验证码，一次搞定所有站点）
 sysu login --code 1234    验证码已发时，用它续上（10 分钟内有效）

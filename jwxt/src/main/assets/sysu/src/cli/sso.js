@@ -9,7 +9,7 @@ sysu sso --ticket <地址>   只打印 service ticket
   sysu sso https://lms.sysu.edu.cn/login/index.php?authCAS=CAS
   sysu sso https://jwxt.sysu.edu.cn/jwxt/api/sso/cas/login?pattern=student-login
 
-凭据来自一次 sysu login 留下的 TGC（~/.config/sysu/jwxt/session.json，旧路径 ~/.config/jwxt/session.json 也认）。`;
+凭据来自一次 sysu login 留下的 TGC（~/.config/sysu/jwxt/session.json）。`;
 
 const mask = (v) => (v.length <= 8 ? '••••' : `${v.slice(0, 4)}…${v.slice(-2)}（${v.length}）`);
 

@@ -47,7 +47,7 @@ sysu sso <站点地址>            # 用统一认证换任意站点的登录态
 - **课名会撞车**：同名课各学院各有一份。课程码最可靠；用课名时只在能唯一确定时才给大纲，否则列候选、不猜——这时候问用户要课程码，别自己指定一个。
 - **绩点是自算口径**（只算有绩点的课，缓考与 P/F 不计），**不是学校官方口径**，别当权威数字汇报。
 - `exams` 和 `course` 要几秒才出结果（有转圈提示），不是卡死。
-- 登录只用 `sysu login`；需要验证码时第一次会把 CAS 会话存进 `~/.config/jwxt/mfa.json`（10 分钟），
+- 登录只用 `sysu login`；需要验证码时第一次会把 CAS 会话存进 `~/.config/sysu/jwxt/mfa.json`（10 分钟），
   拿到码用 `sysu login --code 1234` 续上。不要向用户索要验证码，让他在插件页/终端自己输。
 - 会话失效会自动静默续期；`sysu lms` 靠同一个 CAS TGC 免密进入。
 - **LMS 首次登录要一次企业微信验证码**（站点级 MFA），之后 CAS 记住设备，自动重登不再要码；真过期了跑 `sysu login`。
@@ -63,4 +63,4 @@ sysu sso <站点地址>            # 用统一认证换任意站点的登录态
 
 ## 凭据
 
-`~/.config/sysu/` 下：`credentials`（netid + 密码）、`jwxt/session.json`（教务会话 + **CAS 的 TGC**）、`lms.json`、`gym.json`，都是 0600。旧目录 `~/.config/jwxt/` 仍兼容读取。**TGC 等于全校统一认证钥匙（图书馆、校园网共用），不进任何输出，不外传。**
+`~/.config/sysu/` 下：`credentials`（netid + 密码）、`jwxt/session.json`（教务会话 + **CAS 的 TGC**）、`lms.json`、`gym.json`，都是 0600。**TGC 等于全校统一认证钥匙（图书馆、校园网共用），不进任何输出，不外传。**

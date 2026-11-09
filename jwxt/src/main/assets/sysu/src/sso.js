@@ -14,9 +14,7 @@ const http = require('./http');
 
 const CAS = 'https://cas.sysu.edu.cn/esc-sso';
 const CONFIG_DIR = path.join(os.homedir(), '.config/sysu');
-const LEGACY_SESSION = path.join(os.homedir(), '.config/jwxt/session.json');
 const CRED_FILE = path.join(CONFIG_DIR, 'credentials');
-const LEGACY_CRED_FILE = path.join(os.homedir(), '.config/jwxt/credentials');
 
 const ensureDir = () => fs.mkdirSync(CONFIG_DIR, { recursive: true });
 
@@ -37,10 +35,8 @@ function writeJson(file, data) {
 // TGC 从哪来：环境变量 > 新的统一会话文件 > 旧 jwxt 的会话文件
 function tgc() {
   if (process.env.SYSU_TGC) return process.env.SYSU_TGC;
-  for (const file of [path.join(CONFIG_DIR, 'session.json'), LEGACY_SESSION]) {
-    const t = readJson(file)?.tgc;
-    if (t) return t;
-  }
+  const t = readJson(path.join(CONFIG_DIR, 'session.json'))?.tgc;
+  if (t) return t;
   throw new Error('没有 TGC。先登录一次：sysu login');
 }
 
@@ -57,10 +53,9 @@ function credentials() {
     return { netid: process.env.SYSU_NETID, password: process.env.SYSU_PASSWORD };
   }
   try {
-    const file = [CRED_FILE, LEGACY_CRED_FILE].find((f) => fs.existsSync(f)) || CRED_FILE;
     const cred = Object.fromEntries(
       fs
-        .readFileSync(file, 'utf8')
+        .readFileSync(CRED_FILE, 'utf8')
         .split('\n')
         .map((l) => l.trim())
         .filter((l) => l && !l.startsWith('#') && l.includes('='))

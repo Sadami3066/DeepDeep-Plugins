@@ -49,7 +49,7 @@ sysu login --force     # 已登录时强制重来
 
 登录分三层：`sysu login`（身份/TGC，全校通用）→ `sysu gym login`、`sysu lms login`（换本站 token，只有有独立令牌的站点才需要）→ 业务命令。教务没有独立令牌，所以没有 `sysu jwxt login`。
 
-验证码中断也不怕：第一次执行会把 CAS 会话写进 `~/.config/sysu/jwxt/mfa.json`（0600，10 分钟有效；同时镜像一份到旧路径 `~/.config/jwxt/mfa.json` 供插件读取），
+验证码中断也不怕：第一次执行会把 CAS 会话写进 `~/.config/sysu/jwxt/mfa.json`（0600，10 分钟有效），
 拿到码后用 `--code` 续上，不用重新输密码。插件页的登录卡片读的就是这个文件。
 
 一次登录会留下两张票：
@@ -70,7 +70,7 @@ sysu login --force     # 已登录时强制重来
   gym.json / gym.jar   gym token 与 WAF cookie
 ```
 
-旧版路径 `~/.config/jwxt/` 仍然兼容：读不到新路径时会回退；`mfa.json` 会同时写两份，插件页不用改。
+没有历史版本兼容：配置只用 `~/.config/sysu/`。
 
 ## 教务（`sysu jwxt`）
 
