@@ -2,6 +2,8 @@
 
 ## 2026-11-09
 
+- refactor: 官方插件拆到独立仓库 [DeepDeep-Official-Plugins](https://github.com/Sadami3066/DeepDeep-Official-Plugins)（feishu 1.0.1 / wecom 1.0.1 / sysu 1.0.0 / micloud 1.0.2）；`jwxt` 全面更名 `sysu`（目录、Kotlin 包与类、插件 id `io.github.whywood.deepdeep.plugin.sysu`）；本仓库保留模板、开发文档与上架规则 [拆分] [破坏性]
+
 - feat(jwxt): 插件对外更名为「中山大学 CLI」，内置 `sysu` 多站点 CLI（教务 / 在线教学 / 体育场馆 / 网费 / 统一认证），技能 id 改为 `deepdeep-sysu`；安装路径迁移到 `/root/projects/sysu` 与 `/usr/local/bin/sysu`，清理时兼容删除旧 `jwxt` 路径 [jwxt] [破坏性]
 
 - feat: 新增公开插件模板 `template/`：独立 Gradle 工程，`plugin-api:0.7.0` 从公开 Maven 解析，自带 `assemblePlugin` / `signPlugin` / `verifyPlugin` 与 Ed25519 签名实现，附示例工具、技能与提示词段；本地构建、签名、校验全部通过 [工具] [模板]

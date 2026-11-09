@@ -1,6 +1,9 @@
-# DeepDeep 插件
+# DeepDeep 插件开发
 
-DeepDeep 外部插件的开发仓库：官方插件、模板与签名打包脚本。
+DeepDeep 插件的公开开发资料：模板工程、开发文档与上架规则。
+
+官方插件（飞书、企业微信、中山大学 CLI、小米云服务）已拆到独立仓库
+[DeepDeep-Official-Plugins](https://github.com/Sadami3066/DeepDeep-Official-Plugins)，可作为完整参考实现。
 
 宿主契约 `plugin-api` 与 UI 设计系统 `design` 由公开 Maven 仓库提供：
 
@@ -20,19 +23,25 @@ dependencies {
 
 | 目录 | 说明 |
 |---|---|
-| `template/` | 新插件模板，复制后改 applicationId 与 `plugin.json` 即可开始 |
-| `gradle/plugin-bundle.gradle.kts` | 共享打包脚本：`assemblePlugin` 把 debug APK 重打成 `.ddp`，`signPlugin` 用 Ed25519 签名，`verifyPlugin` 校验签名 |
-| `feishu` `wecom` `jwxt` `micloud` | DeepDeep 官方插件（`jwxt` 现为「中山大学 CLI」）|
-| `keys/` | 本机开发签名密钥（不入库） |
+| `template/` | 独立 Gradle 插件模板，自带打包、签名与校验任务，复制即可开始 |
+| `docs/PLUGIN_DEV.md` | 插件开发文档：契约、清单、`.ddp` 格式、签名、生命周期、扩展面与安全模型 |
+| `MARKET_POLICY.md` | 插件上架与分发规则 |
+| `CHANGELOG.md` | 本仓库变更记录 |
 
-## 构建与验证
+## 快速开始
 
 ```bash
-./scripts/gradlew-locked :feishu:verifyPlugin          # 单个插件
-./scripts/check.sh                      # 全部插件打包签名
+cp -R template my-plugin && cd my-plugin
+# 改 build.gradle.kts 的 namespace / applicationId / versionName
+# 改 src/main/assets/plugin.json 的 id / version / entryClass
+# 改 src/main/kotlin 下包名与入口类
+
+./gradlew assemblePlugin   # build/plugin/my-plugin.unsigned.ddp
+./gradlew signPlugin       # build/plugin/my-plugin.ddp
+./gradlew verifyPlugin     # 校验签名与清单
 ```
 
-产物在 `<module>/build/plugin/<module>.ddp`。安装：把 `.ddp` 传到手机，在 DeepDeep 插件页「导入插件」选择文件；首次安装会展示发布者与能力清单并要求确认。
+模板细节见 `template/README.md`，完整契约与排错见 `docs/PLUGIN_DEV.md`。
 
 ## 发布
 

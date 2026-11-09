@@ -1,6 +1,6 @@
 # DeepDeep 插件开发
 
-面向外部插件作者的开发文档：工程搭建、契约、打包签名、安装更新与全部扩展面。插件工程与本仓库（DeepDeep-Plugins）一起维护：官方插件、模板与共享打包脚本都在这里。
+面向外部插件作者的开发文档：工程搭建、契约、打包签名、安装更新与全部扩展面。插件工程从本仓库的 `template/` 起步；官方插件与共享打包脚本在 [DeepDeep-Official-Plugins](https://github.com/Sadami3066/DeepDeep-Official-Plugins)。
 
 DeepDeep 插件是 **Kotlin 代码插件**：实现 `plugin-api` 的 `DeepDeepPlugin`，打包成 `.ddp`，由宿主在 App 进程内加载。插件只从 `.ddp` 安装，不存在随包编译的插件。
 
@@ -37,7 +37,7 @@ cp -R template my-plugin && cd my-plugin
 #    build/plugin/my-plugin.ddp            可安装的签名包
 ```
 
-如果直接在本仓库内开发：把工程放成 `plugins/my-plugin/` 并在根 `settings.gradle.kts` 的 `include(...)` 注册，然后从仓库根用 `./gradlew :my-plugin:assemblePlugin` 构建。
+本仓库不再维护根构建；复制 `template/` 到任意目录开发即可，模板自带 wrapper 与打包任务。多个插件放在同一个 Gradle 工程时，参考官方插件仓的 `settings.gradle.kts` 与根 `gradle/plugin-bundle.gradle.kts`。
 
 产物文件名由工程名决定。模块只编 `debug` 变体，`release` 不开 minify；`.ddp` 由 debug APK 重打包而来。
 
@@ -190,7 +190,7 @@ plugin.ddp
 
 ### 打包与签名任务
 
-`plugins/` 仓库根 `gradle/plugin-bundle.gradle.kts` 是所有模块共用的构建脚本，提供三个任务：
+模板工程的 `build.gradle.kts` 内含三个打包任务；多模块工程可把这段脚本抽到根 `gradle/plugin-bundle.gradle.kts` 共享（官方插件仓即如此）。
 
 | 任务 | 作用 |
 |---|---|
@@ -198,7 +198,7 @@ plugin.ddp
 | `signPlugin` | 生成/读取 Ed25519 密钥，对 unsigned 包签名并写入 `META-INF/plugin-signature.json`；打印 `publisher keyId`、整包 sha256、entry digest |
 | `verifyPlugin` | 重新按宿主规则验签，输出 `Signature OK` |
 
-密钥默认在仓库根 `keys/plugin-signing.pem`/`.pub`：首次 `signPlugin` 自动生成，私钥权限收敛为 `600`，`.gitignore` 忽略。也可以用 Gradle 属性指定别的前缀（不带扩展名）：
+密钥默认在工程根 `keys/plugin-signing.pem`/`.pub`：首次 `signPlugin` 自动生成，私钥权限收敛为 `600`，`.gitignore` 忽略。也可以用 Gradle 属性指定别的前缀（不带扩展名）：
 
 ```bash
 ./gradlew -PpluginSigningKey=/secure/keys/my-plugin :my-plugin:signPlugin
@@ -733,12 +733,12 @@ host.chat().sendMessage(call.sessionId, "同步完成", ChatMessageOptions(trigg
 
 ## 调试与常见错误
 
-构建/打包/签名（在 `plugins/` 仓库根）：
+构建/打包/签名（在模板工程目录）：
 
 ```bash
-./scripts/gradlew-locked :sample:assemblePlugin :sample:signPlugin :sample:verifyPlugin
-./scripts/gradlew-locked :template:verifyPlugin
-./scripts/check.sh        # 全部官方插件 + sample + template + interop 打包签名自检
+./gradlew assemblePlugin
+./gradlew signPlugin
+./gradlew verifyPlugin
 ```
 
 排查路径：
