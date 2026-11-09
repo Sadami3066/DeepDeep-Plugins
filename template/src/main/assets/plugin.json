@@ -22,6 +22,9 @@
   },
   "homepage": "https://github.com/Sadami3066/DeepDeep-Plugins",
   "icon": "asset:icon.png",
+  "publisher": {
+    "name": "Your Name"
+  },
   "provides": {
     "tools": ["template_echo"],
     "skills": ["template-skill"],

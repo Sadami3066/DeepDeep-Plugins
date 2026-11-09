@@ -85,7 +85,7 @@ cp -R template my-plugin && cd my-plugin
 | `changelog` | string | 否 | 更新说明 |
 | `icon` | string | 否 | 只支持 `asset:<包内相对路径>`，如 `asset:icon.png`；列表按显示尺寸降采样、不染色，缺失或损坏回退占位图标 |
 | `ui` | object | 否 | `{ "apiLevel": 1, "kotlin"?: "2.4", "compose"?: "1.10.5" }`；参与 Compose 槽兼容判定，见「UI 扩展」 |
-| `publisher` | object | 否 | `{ "name": ..., "keyId": ... }`；只做展示，信任以签名里的 `keyId` 为准 |
+| `publisher` | object | 否 | `{ "name": ..., "keyId": ... }`；建议填写 `name`（导入确认页与市场展示作者名），`keyId` 可省略，信任以签名里的 `keyId` 为准 |
 | `provides` | object | 否 | 贡献预检，见下；必须与实际贡献一致 |
 | `capabilities` | string[] | 是 | 插件需要的宿主服务清单，见下；缺失或含未知项拒绝装载 |
 | `requiresPrivilege` | bool | 否（默认 false） | 需要 ADB/Root 能力，确认页与信息弹窗标黄提示 |
@@ -190,15 +190,16 @@ plugin.ddp
 
 ### 打包与签名任务
 
-模板工程的 `build.gradle.kts` 内含三个打包任务；多模块工程可把这段脚本抽到根 `gradle/plugin-bundle.gradle.kts` 共享（官方插件仓即如此）。
+模板工程的 `build.gradle.kts` 内含四个打包任务；多模块工程可把这段脚本抽到根 `gradle/plugin-bundle.gradle.kts` 共享（官方插件仓即如此）。
 
 | 任务 | 作用 |
 |---|---|
+| `generateSigningKey` | 生成 `keys/plugin-signing.pem` 与 `.pub`；已存在则报错，不会覆盖 |
 | `assemblePlugin` | 把 `build/outputs/apk/debug/<module>-debug.apk` 重打成 `build/plugin/<module>.unsigned.ddp`，只保留 `classes*.dex`、`assets/**`、`lib/**`，条目时间固定以便复现 |
-| `signPlugin` | 生成/读取 Ed25519 密钥，对 unsigned 包签名并写入 `META-INF/plugin-signature.json`；打印 `publisher keyId`、整包 sha256、entry digest |
+| `signPlugin` | 读取 Ed25519 密钥，对 unsigned 包签名并写入 `META-INF/plugin-signature.json`；打印 `publisher keyId`、整包 sha256、entry digest |
 | `verifyPlugin` | 重新按宿主规则验签，输出 `Signature OK` |
 
-密钥默认在工程根 `keys/plugin-signing.pem`/`.pub`：首次 `signPlugin` 自动生成，私钥权限收敛为 `600`，`.gitignore` 忽略。也可以用 Gradle 属性指定别的前缀（不带扩展名）：
+密钥默认在工程根 `keys/plugin-signing.pem`/`.pub`，由 `generateSigningKey` 生成，私钥权限收敛为 `600`，`.gitignore` 忽略；`signPlugin` 会把密钥文件计入任务输入，缺失时直接报错而不是自动生成。也可以用 Gradle 属性指定别的前缀（不带扩展名）：
 
 ```bash
 ./gradlew -PpluginSigningKey=/secure/keys/my-plugin :my-plugin:signPlugin

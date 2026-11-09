@@ -26,18 +26,21 @@ dependencies {
 | `template/` | 独立 Gradle 插件模板，自带打包、签名与校验任务，复制即可开始 |
 | `docs/PLUGIN_DEV.md` | 插件开发文档：契约、清单、`.ddp` 格式、签名、生命周期、扩展面与安全模型 |
 | `MARKET_POLICY.md` | 插件上架与分发规则 |
+| `PR_REVIEW.md` | 上架审核清单 |
 | `CHANGELOG.md` | 本仓库变更记录 |
+| `LICENSE` | Apache-2.0 |
 
 ## 快速开始
 
 ```bash
 cp -R template my-plugin && cd my-plugin
-# 改 build.gradle.kts 的 namespace / applicationId / versionName
-# 改 src/main/assets/plugin.json 的 id / version / entryClass
+# 改 settings.gradle.kts 的 rootProject.name、build.gradle.kts 的 namespace / applicationId / versionName
+# 改 src/main/assets/plugin.json 的 id / version / entryClass / publisher.name
 # 改 src/main/kotlin 下包名与入口类
+# 删掉模板 keys/，运行 ./gradlew generateSigningKey 生成自己的签名密钥
 
-./gradlew assemblePlugin   # build/plugin/my-plugin.unsigned.ddp
-./gradlew signPlugin       # build/plugin/my-plugin.ddp
+./gradlew assemblePlugin   # build/plugin/<插件名>.unsigned.ddp
+./gradlew signPlugin       # build/plugin/<插件名>.ddp
 ./gradlew verifyPlugin     # 校验签名与清单
 ```
 

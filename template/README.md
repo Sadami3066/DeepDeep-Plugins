@@ -14,21 +14,24 @@
 ## 构建
 
 ```bash
-./gradlew assemblePlugin   # build/plugin/plugin-template.unsigned.ddp
-./gradlew signPlugin       # 生成 keys/ 并用 Ed25519 签名，产出 build/plugin/plugin-template.ddp
-./gradlew verifyPlugin     # 校验签名与清单
+./gradlew generateSigningKey  # 首次：生成 keys/plugin-signing.pem 与 .pub
+./gradlew assemblePlugin      # build/plugin/plugin-template.unsigned.ddp
+./gradlew signPlugin          # 用 keys/ 的 Ed25519 私钥签名，产出 build/plugin/plugin-template.ddp
+./gradlew verifyPlugin        # 校验签名与清单
 ```
 
-首次 `signPlugin` 会生成 `keys/plugin-signing.pem` 与 `.pub`；`keys/` 已被 gitignore，**私钥请自行备份**。也可用 `-PpluginSigningKey=<base64 PKCS#8>` 传托管密钥，避免落盘。
+`keys/` 已被 gitignore，**私钥绝不提交**，请自行备份；私钥丢失就无法再发布同名插件的更新。`signPlugin` 只读取密钥，缺失时直接报错并提示生成方式。也可用 `-PpluginSigningKey=keys/plugin-signing` 指定其它密钥位置（PKCS#8 PEM 文件路径或相对项目路径，不带 `.pem`/`.pub` 扩展名）。
+
+换钥等于换发布者身份：市场会视为新发布者，已安装用户无法用新钥升级（PUBLISHER_MISMATCH）。
 
 把 `.ddp` 通过深探 App 的「插件 → 导入插件」安装即可。
 
 ## 改成一个新插件
 
-1. `build.gradle.kts`：`namespace` / `applicationId`、`versionName`。
-2. `src/main/assets/plugin.json`：`id`（点分小写，如 `com.example.myplugin`）、`version`、`entryClass`、名称与描述（`default` 必填，`zh`/`en` 可选）。
+1. `settings.gradle.kts` 的 `rootProject.name`、`build.gradle.kts` 的 `namespace` / `applicationId`、`versionName`。
+2. `src/main/assets/plugin.json`：`id`（点分小写，如 `com.example.myplugin`）、`version`、`entryClass`、`publisher.name`（导入页展示的作者名）、名称与描述（`default` 必填，`zh`/`en` 可选）。
 3. `src/main/kotlin/.../TemplatePlugin.kt`：改包名与类名，按需实现 `skills()` / `promptSections()` / `contributions()`。
-4. 换发布者前删掉旧 `keys/`，重新 `signPlugin`；签名私钥丢失即无法再发布同名插件的更新。
+4. 换发布者前删掉旧 `keys/`，重新 `generateSigningKey` 与 `signPlugin`；`signPlugin` 会把密钥文件计入任务输入，换钥后不会复用旧签名。
 
 ## 能力与依赖
 
@@ -50,7 +53,7 @@
 
 | 路径 | 作用 |
 |---|---|
-| `build.gradle.kts` | Android 配置与 `assemblePlugin` / `signPlugin` / `verifyPlugin` 任务（含 Ed25519 与 canonical entry digest 实现） |
+| `build.gradle.kts` | Android 配置与 `generateSigningKey` / `assemblePlugin` / `signPlugin` / `verifyPlugin` 任务（含 Ed25519 与 canonical entry digest 实现） |
 | `src/main/assets/plugin.json` | 插件清单 |
 | `src/main/assets/skills/template-skill/` | 示例技能：`SKILL.md` + `references/format.md` |
 | `src/main/kotlin/.../TemplatePlugin.kt` | 参考实现：`availability`、技能、提示词段、`template_echo` 工具 |

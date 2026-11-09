@@ -64,7 +64,12 @@ dependencies {
     compileOnly("androidx.compose.material3:material3")
 }
 
+private val SIGNING_FILE_SUFFIX_PRIVATE = ".pem"
+private val SIGNING_FILE_SUFFIX_PUBLIC = ".pub"
+
 val signingKeyFile = layout.projectDirectory.file(providers.gradleProperty("pluginSigningKey").getOrElse("keys/plugin-signing"))
+val signingPrivateKeyFile = File(signingKeyFile.asFile.parentFile, signingKeyFile.asFile.name + SIGNING_FILE_SUFFIX_PRIVATE)
+val signingPublicKeyFile = File(signingKeyFile.asFile.parentFile, signingKeyFile.asFile.name + SIGNING_FILE_SUFFIX_PUBLIC)
 val unsignedBundle = layout.buildDirectory.file("plugin/${project.name}.unsigned.ddp")
 val signedBundle = layout.buildDirectory.file("plugin/${project.name}.ddp")
 
@@ -113,16 +118,27 @@ val assemblePlugin = tasks.register("assemblePlugin") {
     }
 }
 
+val generateSigningKey = tasks.register("generateSigningKey") {
+    group = "plugin"
+    description = "Generates the Ed25519 signing key pair used by signPlugin."
+    doLast {
+        writeEd25519KeyPair(signingKeyFile.asFile)
+        logger.lifecycle("Generated ${signingPrivateKeyFile.absolutePath} and ${signingPublicKeyFile.absolutePath}")
+        logger.lifecycle("Keep the .pem private and back it up: anyone holding it can publish updates as this publisher.")
+    }
+}
+
 val signPlugin = tasks.register("signPlugin") {
     group = "plugin"
     description = "Signs the .ddp with an Ed25519 key and writes META-INF/plugin-signature.json."
     dependsOn(assemblePlugin)
     inputs.file(unsignedBundle)
+    inputs.files(signingPrivateKeyFile, signingPublicKeyFile).optional()
     outputs.file(signedBundle)
     doLast {
         val source = unsignedBundle.get().asFile
         check(source.isFile) { "missing ${source.absolutePath}; run assemblePlugin first" }
-        val keyPair = loadOrCreateEd25519KeyPair(signingKeyFile.asFile)
+        val keyPair = loadEd25519KeyPair(signingKeyFile.asFile)
         val keyId = ed25519KeyId(keyPair.public)
         val digest = canonicalEntryDigest(source)
         val signature = Signature.getInstance("Ed25519").run {
@@ -169,20 +185,25 @@ private val SIGNATURE_ENTRY = "META-INF/plugin-signature.json"
 private val FIXED_ENTRY_TIME = 315532800000L
 private val DEX_ENTRY = Regex("classes[0-9]*\\.dex")
 private val NATIVE_ENTRY = Regex("lib/[^/]+/.+")
-private val SIGNING_FILE_SUFFIX_PRIVATE = ".pem"
-private val SIGNING_FILE_SUFFIX_PUBLIC = ".pub"
 
-private fun loadOrCreateEd25519KeyPair(base: File): KeyPair {
+private fun loadEd25519KeyPair(base: File): KeyPair {
     val privateFile = File(base.parentFile, base.name + SIGNING_FILE_SUFFIX_PRIVATE)
     val publicFile = File(base.parentFile, base.name + SIGNING_FILE_SUFFIX_PUBLIC)
-    if (privateFile.isFile && publicFile.isFile) {
-        val factory = KeyFactory.getInstance("Ed25519")
-        val privateKey = factory.generatePrivate(PKCS8EncodedKeySpec(decodePem(privateFile.readText())))
-        val publicKey = factory.generatePublic(X509EncodedKeySpec(decodePem(publicFile.readText())))
-        return KeyPair(publicKey, privateKey)
+    check(privateFile.isFile && publicFile.isFile) {
+        "missing signing key: ${privateFile.absolutePath} or ${publicFile.absolutePath}; " +
+            "run ./gradlew generateSigningKey to create one, or pass -PpluginSigningKey=<key path prefix>"
     }
+    val factory = KeyFactory.getInstance("Ed25519")
+    val privateKey = factory.generatePrivate(PKCS8EncodedKeySpec(decodePem(privateFile.readText())))
+    val publicKey = factory.generatePublic(X509EncodedKeySpec(decodePem(publicFile.readText())))
+    return KeyPair(publicKey, privateKey)
+}
+
+private fun writeEd25519KeyPair(base: File) {
+    val privateFile = File(base.parentFile, base.name + SIGNING_FILE_SUFFIX_PRIVATE)
+    val publicFile = File(base.parentFile, base.name + SIGNING_FILE_SUFFIX_PUBLIC)
     check(!privateFile.exists() && !publicFile.exists()) {
-        "only one of ${privateFile.name}/${publicFile.name} exists; restore the other or delete both to regenerate"
+        "signing key already exists at ${privateFile.absolutePath}; delete both ${privateFile.name} and ${publicFile.name} to regenerate"
     }
     privateFile.parentFile.mkdirs()
     val keyPair = KeyPairGenerator.getInstance("Ed25519").generateKeyPair()
@@ -192,9 +213,6 @@ private fun loadOrCreateEd25519KeyPair(base: File): KeyPair {
     privateFile.setReadable(true, true)
     privateFile.setWritable(true, true)
     privateFile.setExecutable(false, false)
-    logger.lifecycle("Generated a new plugin signing key at ${privateFile.absolutePath}")
-    logger.lifecycle("Keep the .pem private: anyone holding it can publish updates as this publisher.")
-    return keyPair
 }
 
 private fun encodePem(type: String, bytes: ByteArray): String {
