@@ -11,7 +11,13 @@ dependencyResolutionManagement {
     repositories {
         mavenLocal {
             content {
-                includeGroup("io.github.whywood.deepdeep")
+                includeGroup("io.github.sadami3066.deepdeep")
+            }
+        }
+        maven {
+            url = uri("https://sadami3066.github.io/deepdeep-maven")
+            content {
+                includeGroup("io.github.sadami3066.deepdeep")
             }
         }
         google()

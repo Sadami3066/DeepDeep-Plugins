@@ -1,6 +1,6 @@
 # micloud · 小米云服务外部插件
 
-DeepDeep 官方小米云插件，打成外部 `.ddp`：WebView 登录 i.mi.com 拿 cookie 后加密保存，用 `mi_cloud_*` 工具读取账号、短信、联系人、相册与录音，读写笔记与待办；所有开关与登录操作都在插件自绘页面完成。只 `compileOnly` 依赖发布到 mavenLocal 的 `io.github.whywood.deepdeep:plugin-api`，不引用宿主内部类型（`R.string`、DataStore、`Activity`、`AppGraph` 等一律不用）。
+DeepDeep 官方小米云插件，打成外部 `.ddp`：WebView 登录 i.mi.com 拿 cookie 后加密保存，用 `mi_cloud_*` 工具读取账号、短信、联系人、相册与录音，读写笔记与待办；所有开关与登录操作都在插件自绘页面完成。只 `compileOnly` 依赖公开 Maven 仓库 `https://sadami3066.github.io/deepdeep-maven` 的 `io.github.sadami3066.deepdeep:plugin-api`，不引用宿主内部类型（`R.string`、DataStore、`Activity`、`AppGraph` 等一律不用）。
 
 ## 文件
 

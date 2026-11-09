@@ -1,0 +1,33 @@
+{
+  "id": "io.github.whywood.deepdeep.plugintemplate",
+  "version": "1.0.0",
+  "apiLevel": 4,
+  "minHostVersion": "0.2.0",
+  "capabilities": [],
+  "entryClass": "io.github.whywood.deepdeep.plugintemplate.TemplatePlugin",
+  "name": {
+    "default": "Plugin Template",
+    "zh": "插件模板",
+    "en": "Plugin Template"
+  },
+  "summary": {
+    "default": "Starting point for external DeepDeep plugins: one tool, one skill and one prompt section.",
+    "zh": "外部插件起点：一个工具、一个技能与一段提示词。",
+    "en": "Starting point for external DeepDeep plugins: one tool, one skill and one prompt section."
+  },
+  "description": {
+    "default": "Copy this project, rename the plugin id and entry class, then build and sign a .ddp bundle.",
+    "zh": "复制本工程，改插件 id 与入口类，即可构建并签名自己的 .ddp 插件包。",
+    "en": "Copy this project, rename the plugin id and entry class, then build and sign a .ddp bundle."
+  },
+  "homepage": "https://github.com/Sadami3066/DeepDeep-Plugins",
+  "icon": "asset:icon.png",
+  "provides": {
+    "tools": ["template_echo"],
+    "skills": ["template-skill"],
+    "uiSlots": [],
+    "pages": []
+  },
+  "requiresPrivilege": false,
+  "defaultEnabled": true
+}
