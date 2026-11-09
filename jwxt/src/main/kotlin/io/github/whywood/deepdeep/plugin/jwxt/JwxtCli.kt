@@ -5,7 +5,7 @@ import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 
 internal object JwxtCli {
-    const val VERSION = "3.3.1"
+    const val VERSION = "3.3.2"
     const val MIN_NODE_MAJOR = 22
     const val SKILL_ID = "deepdeep-sysu"
 
