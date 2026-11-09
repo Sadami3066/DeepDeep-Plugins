@@ -31,10 +31,10 @@ internal object JwxtCli {
         appendLine("echo '@@cli@@'")
         appendLine("$BIN_PATH --version 2>&1 || true")
         appendLine("echo '@@session@@'")
-        appendLine("cat $SESSION_PATH 2>/dev/null || true")
+        appendLine("cat $SESSION_PATH 2>/dev/null || cat /root/.config/jwxt/session.json 2>/dev/null || true")
         appendLine("echo")
         appendLine("echo '@@credentials@@'")
-        appendLine("cat $CREDENTIALS_PATH 2>/dev/null || true")
+        appendLine("cat $CREDENTIALS_PATH 2>/dev/null || cat /root/.config/jwxt/credentials 2>/dev/null || true")
         appendLine("echo")
         appendLine("echo '@@end@@'")
     }
@@ -59,13 +59,15 @@ internal object JwxtCli {
     fun writeFileCommand(path: String, base64: String): String =
         "mkdir -p ${path.substringBeforeLast('/')} && printf %s '$base64' | base64 -d > $path"
 
-    fun credentialsReadCommand(): String = "cat $CREDENTIALS_PATH 2>/dev/null || true"
+    fun credentialsReadCommand(): String =
+        "cat $CREDENTIALS_PATH 2>/dev/null || cat /root/.config/jwxt/credentials 2>/dev/null || true"
 
     fun credentialsCommand(netId: String, password: String): String =
         writeFileCommand(CREDENTIALS_PATH, base64(credentialsContent(netId, password))) +
             " && chmod 600 $CREDENTIALS_PATH"
 
-    fun logoutCommand(): String = "rm -f $SESSION_PATH $MFA_PATH"
+    fun logoutCommand(): String =
+        "rm -f $SESSION_PATH $MFA_PATH /root/.config/jwxt/session.json /root/.config/jwxt/mfa.json"
 
     fun loginSendCodeCommand(): String = "sysu login --send-code"
 
