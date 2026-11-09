@@ -376,7 +376,7 @@ private fun signInValue(host: PluginHost, status: JwxtStatus?): String = when {
 
 private val TEXT_RUNTIME = literal("运行环境", "Runtime")
 private val TEXT_NODE_JS = literal("Node.js", "Node.js")
-private val TEXT_CLI = literal("教务 CLI", "Academic CLI")
+private val TEXT_CLI = literal("校园 CLI", "Campus CLI")
 private val TEXT_ACCOUNT = literal("账号", "Account")
 private val TEXT_SIGN_IN_STATE = literal("登录状态", "Sign-in")
 private val TEXT_AVAILABLE = literal("可用", "Available")
@@ -398,12 +398,12 @@ private val TEXT_HINT_NODE = literal(
     "Node.js is missing. Install Node.js (version 22 or newer) in Settings → Runtime.",
 )
 private val TEXT_HINT_INSTALL = literal(
-    "尚未安装教务 CLI，点「保存并登录」会自动安装",
-    "The academic CLI is not installed yet; tap \"Save and sign in\" to install it automatically.",
+    "尚未安装校园 CLI，点「保存并登录」会自动安装",
+    "The campus CLI is not installed yet; tap \"Save and sign in\" to install it automatically.",
 )
 private val TEXT_HINT_UPDATE = literal(
-    "教务 CLI 版本不是最新，点「保存并登录」会自动更新",
-    "The academic CLI is not up to date; tap \"Save and sign in\" to update it automatically.",
+    "校园 CLI 版本不是最新，点「保存并登录」会自动更新",
+    "The campus CLI is not up to date; tap \"Save and sign in\" to update it automatically.",
 )
 private val TEXT_NET_ID = literal("NetID", "NetID")
 private val TEXT_PASSWORD = literal("密码", "Password")

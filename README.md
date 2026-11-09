@@ -22,7 +22,7 @@ dependencies {
 |---|---|
 | `template/` | 新插件模板，复制后改 applicationId 与 `plugin.json` 即可开始 |
 | `gradle/plugin-bundle.gradle.kts` | 共享打包脚本：`assemblePlugin` 把 debug APK 重打成 `.ddp`，`signPlugin` 用 Ed25519 签名，`verifyPlugin` 校验签名 |
-| `feishu` `wecom` `jwxt` `micloud` | DeepDeep 官方插件 |
+| `feishu` `wecom` `jwxt` `micloud` | DeepDeep 官方插件（`jwxt` 现为「中山大学 CLI」）|
 | `keys/` | 本机开发签名密钥（不入库） |
 
 ## 构建与验证

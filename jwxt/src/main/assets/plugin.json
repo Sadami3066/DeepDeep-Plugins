@@ -1,6 +1,6 @@
 {
   "id": "io.github.whywood.deepdeep.plugin.jwxt",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "apiLevel": 4,
   "minHostVersion": "0.2.0",
   "capabilities": [
@@ -10,19 +10,19 @@
   ],
   "entryClass": "io.github.whywood.deepdeep.plugin.jwxt.JwxtPlugin",
   "name": {
-    "default": "中山大学教务",
-    "zh": "中山大学教务",
-    "en": "SYSU Academic"
+    "default": "中山大学 CLI",
+    "zh": "中山大学 CLI",
+    "en": "SYSU CLI"
   },
   "summary": {
-    "default": "课表、成绩、考试、公告与请假",
-    "zh": "课表、成绩、考试、公告与请假",
-    "en": "Timetable, grades, exams, notices and leave"
+    "default": "教务、在线教学、体育场馆与网费",
+    "zh": "教务、在线教学、体育场馆与网费",
+    "en": "Academics, LMS, sports venues, and campus network"
   },
   "description": {
-    "default": "查询课表、成绩、学分、考试、公告、空闲教室与请假记录；账号密码只在插件页使用",
-    "zh": "查询课表、成绩、学分、考试、公告、空闲教室与请假记录；账号密码只在插件页使用",
-    "en": "Query the SYSU academic system from the Linux runtime with a Node.js CLI: timetable, grades, credits, exams, notices, free classrooms and leave records. Account credentials and sign-in are handled on the plugin page; the CLI installs itself on first use."
+    "default": "在 Linux 运行环境里使用 Node.js 版校园 CLI：课表、成绩、作业、课件下载、体育场馆预约、网费查询与续费。账号密码只在插件页使用，首次打开会自动安装。",
+    "zh": "在 Linux 运行环境里使用 Node.js 版校园 CLI：课表、成绩、作业、课件下载、体育场馆预约、网费查询与续费。账号密码只在插件页使用，首次打开会自动安装。",
+    "en": "Use the Node.js campus CLI inside the Linux runtime: timetable, grades, assignments, course files, sports venue booking, and campus network fees. Credentials are handled on the plugin page; the CLI installs itself on first use."
   },
   "icon": "asset:icon.png",
   "ui": {
@@ -31,7 +31,7 @@
   "provides": {
     "tools": [],
     "skills": [
-      "deepdeep-jwxt"
+      "deepdeep-sysu"
     ],
     "uiSlots": [],
     "pages": [

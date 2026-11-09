@@ -1,9 +1,0 @@
-{
-  "name": "jwxt",
-  "version": "1.0.0",
-  "description": "中山大学教务系统 CLI",
-  "type": "commonjs",
-  "bin": { "jwxt": "bin/jwxt" },
-  "scripts": { "start": "node bin/jwxt" },
-  "dependencies": {}
-}

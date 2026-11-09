@@ -245,7 +245,7 @@ class JwxtPlugin : DeepDeepPlugin {
 
     private companion object {
         const val PAGE_ID = "main"
-        const val SECTION_ID = "jwxt_prompt"
+        const val SECTION_ID = "sysu_prompt"
         const val ICON_ASSET = "icon.png"
         const val SUPPORTED_ABI = "arm64-v8a"
         const val PROMPT_PRIORITY = 10
@@ -266,7 +266,7 @@ class JwxtPlugin : DeepDeepPlugin {
             "Install the Linux environment in Settings → Runtime first",
         )
         val TEXT_STAGE_CHECKING = literal("正在检查 Node.js…", "Checking Node.js…")
-        val TEXT_STAGE_INSTALLING = literal("正在安装教务 CLI…", "Installing the academic CLI…")
+        val TEXT_STAGE_INSTALLING = literal("正在安装校园 CLI…", "Installing the campus CLI…")
         val TEXT_STAGE_LOGIN = literal("正在登录…", "Signing in…")
         val TEXT_STAGE_CODE = literal("正在提交验证码…", "Submitting the verification code…")
         val TEXT_ERROR_NODE_MISSING = literal(
@@ -294,7 +294,7 @@ class JwxtPlugin : DeepDeepPlugin {
         )
         val TEXT_ERROR_LOGOUT = literal("退出登录失败：%1\$s", "Sign-out failed: %1\$s")
         val TEXT_ERROR_CODE_FORMAT = literal("请输入 4 位数字验证码", "Enter the 4-digit verification code")
-        val TEXT_PAGE_TITLE = literal("中山大学教务", "SYSU Academic")
+        val TEXT_PAGE_TITLE = literal("中山大学 CLI", "SYSU CLI")
     }
 }
 

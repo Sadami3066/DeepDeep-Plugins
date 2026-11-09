@@ -5,25 +5,25 @@ import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 
 internal object JwxtCli {
-    const val VERSION = "1.0.0"
+    const val VERSION = "3.3.1"
     const val MIN_NODE_MAJOR = 22
-    const val SKILL_ID = "deepdeep-jwxt"
+    const val SKILL_ID = "deepdeep-sysu"
 
     const val SECRET_NET_ID = "netid"
     const val SECRET_PASSWORD = "password"
 
     val CODE_PATTERN = Regex("""^\d{4}$""")
 
-    const val ASSET_ROOT = "jwxt"
-    const val ENTRY_RELATIVE = "bin/jwxt"
+    const val ASSET_ROOT = "sysu"
+    const val ENTRY_RELATIVE = "bin/sysu"
     const val PACKAGE_RELATIVE = "package.json"
 
-    const val INSTALL_DIR = "/root/projects/jwxt"
-    const val BIN_PATH = "/usr/local/bin/jwxt"
-    const val CONFIG_DIR = "/root/.config/jwxt"
+    const val INSTALL_DIR = "/root/projects/sysu"
+    const val BIN_PATH = "/usr/local/bin/sysu"
+    const val CONFIG_DIR = "/root/.config/sysu"
     const val CREDENTIALS_PATH = "$CONFIG_DIR/credentials"
-    const val SESSION_PATH = "$CONFIG_DIR/session.json"
-    const val MFA_PATH = "$CONFIG_DIR/mfa.json"
+    const val SESSION_PATH = "$CONFIG_DIR/jwxt/session.json"
+    const val MFA_PATH = "$CONFIG_DIR/jwxt/mfa.json"
 
     fun statusCommand(): String = buildString {
         appendLine("echo '@@node@@'")
@@ -53,7 +53,8 @@ internal object JwxtCli {
         appendLine("$BIN_PATH --version")
     }
 
-    fun cleanupCommand(): String = "rm -rf $INSTALL_DIR $BIN_PATH"
+    fun cleanupCommand(): String =
+        "rm -rf $INSTALL_DIR $BIN_PATH /root/projects/jwxt /usr/local/bin/jwxt"
 
     fun writeFileCommand(path: String, base64: String): String =
         "mkdir -p ${path.substringBeforeLast('/')} && printf %s '$base64' | base64 -d > $path"
@@ -66,9 +67,9 @@ internal object JwxtCli {
 
     fun logoutCommand(): String = "rm -f $SESSION_PATH $MFA_PATH"
 
-    fun loginSendCodeCommand(): String = "jwxt login --send-code"
+    fun loginSendCodeCommand(): String = "sysu login --send-code"
 
-    fun loginCodeCommand(code: String): String = "jwxt login --code $code"
+    fun loginCodeCommand(code: String): String = "sysu login --code $code"
 
     fun credentialsContent(netId: String, password: String): String =
         "netid=${netId.trim()}\npassword=${password.trim()}\n"
