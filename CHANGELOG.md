@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-11-10
+
+- feat(api): 插件 API 升到 v2（`PLUGIN_API_LEVEL` / `BASELINE_API_LEVEL` 4→5）；删除 `host.privilege()` / `PrivilegeService` 与清单字段 `requiresPrivilege`；`host.linux()` / `host.files()` 语义不变，执行身份由用户选择的访问档位（LOCAL/ADB/ROOT）决定 [api] [破坏性]
+- docs: 同步更新 `docs/PLUGIN_DEV.md` 的清单字段、capabilities 列表、宿主服务、ABI 与安全模型；模板 `plugin.json` 的 `apiLevel` 改为 5；中英文 README 的 API level 与特权说明同步 [文档] [模板]
+
 ## 2026-11-09
 
 - refactor: 官方插件拆到独立仓库 [DeepDeep-Official-Plugins](https://github.com/Sadami3066/DeepDeep-Official-Plugins)（feishu 1.0.1 / wecom 1.0.1 / sysu 1.0.0 / micloud 1.0.2）；`jwxt` 全面更名 `sysu`（目录、Kotlin 包与类、插件 id `io.github.whywood.deepdeep.plugin.sysu`）；本仓库保留模板、开发文档与上架规则 [拆分] [破坏性]

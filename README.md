@@ -51,7 +51,7 @@ dependencyResolutionManagement {
 
 ```kotlin
 dependencies {
-    compileOnly("io.github.sadami3066.deepdeep:plugin-api:0.7.0")
+    compileOnly("io.github.sadami3066.deepdeep:plugin-api:0.8.0")
 }
 ```
 
@@ -127,10 +127,10 @@ cd my-plugin
 
 - **签名私钥丢失 = 无法更新**：私钥没有找回机制，丢失后只能换钥以新发布者身份重新上架，已安装用户不会自动升级到新钥签名的版本。请离线备份私钥。
 - **发布者身份只看 `keyId`**：`plugin.json` 里的 `publisher.name` 只是展示名，可任意填写；真正身份是签名文件里的 `keyId`。首次安装确认页与市场条目都以 `publisherKeyId` 为准，只安装你认识的 `keyId`。
-- **同进程、同权限**：插件与 App 同进程、同 UID、无沙箱，能读写 App 私有数据、反射宿主内部类、起线程、结束进程。`capabilities` 只控制访问器注入，不是权限边界；`requiresPrivilege` 只是提示。
+- **同进程、同权限**：插件与 App 同进程、同 UID、无沙箱，能读写 App 私有数据、反射宿主内部类、起线程、结束进程。`capabilities` 只控制访问器注入，不是权限边界。执行身份由用户选择的访问档位（LOCAL/ADB/ROOT）决定，不要假设永远以 root 运行。
 - **第三方依赖与服务**：插件可自带第三方库打进 dex，也可访问网络与第三方服务；这些代码与服务的许可证、安全与合规由插件作者和用户承担。
 - **崩溃影响范围**：插件的工具/回调异常会被宿主隔离，但插件在主线程、Compose 槽位或工具执行中导致进程崩溃时，仍会带崩 App。
-- **发布前无 ABI 兼容承诺**：`plugin-api` 当前处于发布前开发期（SDK 0.7.0、API level 4），类型与签名可能直接删改而不升 API level；请按最新 SDK 重新编译插件。
+- **发布前无 ABI 兼容承诺**：`plugin-api` 当前处于发布前开发期（SDK 0.8.0、API level 5），类型与签名可能直接删改而不升 API level；请按最新 SDK 重新编译插件。
 - **审核不是安全担保**：市场人工审核只核对上架规则与描述一致性，不保证插件无漏洞、无恶意行为。
 
 ## 权益与许可
