@@ -16,7 +16,7 @@ This repository is for external plugin authors: start from `template/`, develop 
 
 | Path | Description |
 |---|---|
-| [`template/`](template/) | Standalone Gradle Android plugin template: sample tool, skill and prompt section, plus the full build, signing and verification tasks |
+| [`template/`](template/) | Standalone Gradle Android plugin template: example tool, skill and prompt section, plus the full build, signing and verification tasks |
 | [`docs/PLUGIN_DEV.md`](docs/PLUGIN_DEV.md) | Plugin development guide: host contract, `plugin.json` manifest, `.ddp` package format, signing and verification, install/update, lifecycle, extension points and security model |
 | [`MARKET_POLICY.md`](MARKET_POLICY.md) | Marketplace policy: accepted content, prohibited content, submission requirements, signing and takedown rules |
 | [`PR_REVIEW.md`](PR_REVIEW.md) | Marketplace review checklist |
