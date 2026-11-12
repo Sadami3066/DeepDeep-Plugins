@@ -1,8 +1,11 @@
 {
   "id": "io.github.whywood.deepdeep.plugintemplate",
   "version": "1.0.0",
-  "apiLevel": 5,
-  "minHostVersion": "1.0.1",
+  "apiLevel": 6,
+  "minHostVersion": "1.0.4",
+  "ui": {
+    "apiLevel": 2
+  },
   "capabilities": [],
   "entryClass": "io.github.whywood.deepdeep.plugintemplate.TemplatePlugin",
   "name": {

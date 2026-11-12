@@ -5,10 +5,15 @@ import io.github.whywood.deepdeep.plugin.api.DeepDeepPlugin
 import io.github.whywood.deepdeep.plugin.api.PluginAvailability
 import io.github.whywood.deepdeep.plugin.api.PluginHost
 import io.github.whywood.deepdeep.plugin.api.PluginSkill
-import io.github.whywood.deepdeep.plugin.api.PluginSkillFile
-import io.github.whywood.deepdeep.plugin.api.PluginTool
-import io.github.whywood.deepdeep.plugin.api.PluginToolResult
 import io.github.whywood.deepdeep.plugin.api.PromptSection
+import io.github.whywood.deepdeep.plugin.api.available
+import io.github.whywood.deepdeep.plugin.api.contributions
+import io.github.whywood.deepdeep.plugin.api.pluginSkill
+import io.github.whywood.deepdeep.plugin.api.pluginSkillFile
+import io.github.whywood.deepdeep.plugin.api.pluginTool
+import io.github.whywood.deepdeep.plugin.api.promptSection
+import io.github.whywood.deepdeep.plugin.api.textResult
+import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
@@ -17,14 +22,14 @@ import kotlinx.serialization.json.putJsonObject
 
 class TemplatePlugin : DeepDeepPlugin {
 
-    override suspend fun availability(host: PluginHost): PluginAvailability = PluginAvailability.Available
+    override suspend fun availability(host: PluginHost): PluginAvailability = available()
 
     override fun skills(host: PluginHost): List<PluginSkill> = listOf(
-        PluginSkill(
+        pluginSkill(
             id = SKILL_ID,
             markdown = skillMarkdown(host),
             files = listOf(
-                PluginSkillFile(
+                pluginSkillFile(
                     path = "references/format.md",
                     assetPath = "$SKILL_ASSET_DIR/references/format.md",
                 ),
@@ -33,13 +38,13 @@ class TemplatePlugin : DeepDeepPlugin {
     )
 
     override fun promptSections(host: PluginHost): List<PromptSection> = listOf(
-        PromptSection(
+        promptSection(
             id = PROMPT_SECTION_ID,
             body = "Template plugin is installed. Call `template_echo` when you need to echo a short text back.",
         ),
     )
 
-    override fun contributions(host: PluginHost): Contributions = Contributions(tools = listOf(echoTool))
+    override fun contributions(host: PluginHost): Contributions = contributions(tools = listOf(echoTool))
 
     private fun skillMarkdown(host: PluginHost): String {
         val fromAssets = runCatching {
@@ -49,7 +54,7 @@ class TemplatePlugin : DeepDeepPlugin {
         return host.context.assets.open("$SKILL_ASSET_DIR/SKILL.md").bufferedReader().use { it.readText() }
     }
 
-    private val echoTool = PluginTool(
+    private val echoTool = pluginTool(
         name = "template_echo",
         label = "template_echo",
         description = "Echo the provided text back, prefixed with the plugin name. Useful to verify that an external plugin is installed and its tool is callable.",
@@ -62,13 +67,13 @@ class TemplatePlugin : DeepDeepPlugin {
                 }
             }
             putJsonArray("required") {
-                add(kotlinx.serialization.json.JsonPrimitive("message"))
+                add(JsonPrimitive("message"))
             }
         },
         promptGuidelines = listOf("Call template_echo only when the user asks to verify the template plugin."),
     ) { call ->
         val message = call.args["message"]?.jsonPrimitive?.content.orEmpty()
-        PluginToolResult.text("template_echo: $message")
+        textResult("template_echo: $message")
     }
 
     private companion object {

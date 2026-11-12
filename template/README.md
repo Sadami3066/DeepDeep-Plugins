@@ -7,7 +7,7 @@
 - JDK 17
 - Android SDK：compileSdk 36、minSdk 29
 - Gradle 9.8.2（已带 wrapper）
-- 依赖 `plugin-api:0.8.1`，来自 <https://sadami3066.github.io/deepdeep-maven>
+- 依赖 `plugin-api:1.0.0`，来自 <https://sadami3066.github.io/deepdeep-maven>
 
 `local.properties` 写 `sdk.dir=/path/to/Android/Sdk`，或设置 `ANDROID_HOME`。
 
