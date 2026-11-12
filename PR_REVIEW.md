@@ -9,6 +9,8 @@
 - [ ] `name` / `summary` / `description` / `tags` 中英双语，不含开发侧说明、内部链接或夸大宣传
 - [ ] `artifact.url` 可长期公开下载，`artifact.sha256` 与 `artifact.size` 和文件逐字节一致
 - [ ] 图标为 ≤128KB 的 PNG，品牌图标需注明来源
+- [ ] `plugin.requiredAccess` 如实标注运行所需档位（`normal`/`adb`/`root`），需要 Root 的插件说明原因
+- [ ] `plugin.previews`（如有）为 1–6 个 https 竖版图（9:20），内容与插件一致
 
 ## 制品
 
