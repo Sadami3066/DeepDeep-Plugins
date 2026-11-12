@@ -18,7 +18,7 @@ plugins {
     id("org.jetbrains.kotlin.plugin.compose") version "2.4.21"
 }
 
-val pluginApiVersion = "0.8.1"
+val pluginApiVersion = "1.0.0"
 
 android {
     namespace = "io.github.whywood.deepdeep.pluginsample"
