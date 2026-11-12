@@ -2,6 +2,7 @@
 
 ## 2026-11-12
 
+- feat: 模板与示例迁移到 `plugin-api:1.0.0`（API level 6、`ui.apiLevel` 2），清单改为 `apiLevel` 6 / `minHostVersion` 1.0.4，改用顶层工厂与接口；中英文 README 的 SDK 版本表同步 [依赖] [模板] [破坏性]
 - feat: 新增 `sample/` 测试夹具（`sample_echo` 工具 + `sample.main` 页面，随仓库提交仅用于开发的 Ed25519 签名密钥），供宿主仓库 `scripts/plugin-e2e.sh` 在设备上回归外部插件的安装、启用、停用、升级与卸载 [工具] [模板]
 - chore: 模板升到 `plugin-api:0.8.1`（消费端 R8 keep 规则补齐），模板清单 `minHostVersion` 改为 `1.0.1`；README 与开发文档的版本表同步 [依赖] [文档]
 
