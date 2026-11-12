@@ -462,8 +462,8 @@ class MyPlugin : DeepDeepPlugin, PromptOverridePlugin {
 ```
 
 - 清单必须声明 `capabilities: ["prompt", ...]`；未声明时宿主不会调用 `promptOverride()`。
-- 合并规则：多个插件按 `priority` 从高到低取 `preamble` / `rules`（高优先级生效，冲突写宿主日志）；`sections` 按 `priority` 升序拼接。
-- 预算：单个插件 `sections` 合计 32 KiB、所有插件合计 64 KiB，超出截断并记日志。
+- 合并规则：多个插件按 `priority` 从高到低取 `preamble` / `rules`（高优先级生效，冲突写宿主日志）；`sections` 按 `priority` 升序拼接，与 `promptSections()` 的段落一起进入系统提示词的插件段。
+- 预算：单个插件的 `preamble`、`rules`、`sections` 合计 32 KiB，所有插件合计 64 KiB；超出的插件贡献整条跳过并记日志。
 - 覆盖只作用于 Agent 的 preamble 与 rules；宿主生成的工作区/环境段落不参与覆盖，始终保留。
 - 回调异常由宿主隔离，只记日志，不中断会话。
 - 与 `promptSections()` 的分工：`promptSections()` 只追加段落、任何插件都能用；提示词覆盖需要声明 `prompt` capability，用于替换 Agent 的默认身份与规则。
