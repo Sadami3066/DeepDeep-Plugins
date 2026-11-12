@@ -117,7 +117,7 @@ cp -R template my-plugin && cd my-plugin
 | `screen` | `host.screen()` |
 | `notifications` | `host.notifications()` |
 | `secrets` | `host.secrets()` |
-| `network` | `host.network()` |
+| `network` | `host.network()`；非常规协议可用 JVM 网络栈（`java.net`/`javax.net.ssl`） |
 | `files` | `host.files()` |
 | `sessions` | `host.sessions()` |
 | `jobs` | `host.jobs()` |
@@ -301,7 +301,7 @@ sha256 对条目的**未压缩内容**计算，行与行直接拼接、最后一
 
 插件的登录、CLI 安装、连接状态等全部由插件自己管理：状态写在 `host.dataDir`/`host.secrets()`，界面画在插件页面里；宿主不再提供安装/连接/设置/状态/动作/详情行回调，也没有面向模型的插件连接工具。页面里的操作改变能力后调用 `host.requestContributionsRefresh()`，宿主会重新物化贡献并在安全点重建会话（忙碌会话在本轮结束后生效），工具/技能/提示词/页面随即更新。
 
-`host` 是插件唯一入口（`PluginHost`）：`manifest`、`context`（宿主注入的 App 上下文）、`dataDir`、`assetsDir`、`scope`、`text`、17 个宿主服务访问器（见「宿主服务」）与 `requestContributionsRefresh()`。`manifest` 等清单类型是宿主构造的只读接口，插件不要自行构造。
+`host` 是插件唯一入口（`PluginHost`）：`manifest`、`context`（宿主注入的 App 上下文）、`dataDir`、`assetsDir`、`scope`、`text`、宿主服务访问器（见「宿主服务」）与 `requestContributionsRefresh()`。`manifest` 等清单类型是宿主构造的只读接口，插件不要自行构造。
 
 ### 每插件作用域
 
@@ -666,7 +666,7 @@ val result = host.chat().sendMessage(
 
 ## 宿主服务
 
-`PluginHost` 暴露 17 个服务访问器；宿主没提供该服务时**抛 `PluginServiceUnavailable`**（不是返回 null），插件应 `runCatching` 后降级。服务已装配但当前不可用（如未装 Linux、未授权 ADB）时，通常通过 `available`/`enabled` 字段或明确异常表达。
+`PluginHost` 暴露宿主服务访问器；宿主没提供该服务时**抛 `PluginServiceUnavailable`**（不是返回 null），插件应 `runCatching` 后降级。服务已装配但当前不可用（如未装 Linux、未授权 ADB）时，通常通过 `available`/`enabled` 字段或明确异常表达。
 
 ```kotlin
 val linux = runCatching { host.linux() }.getOrNull()
@@ -741,7 +741,7 @@ host.chat().sendMessage(call.sessionId, "同步完成", chatMessageOptions(trigg
 - 页面由 `PluginUiContributions.pages` 声明，`PluginPage.content` 就是页面内容（宿主直接渲染，不经过槽位）；列表里点整行进入第一个页面，多页面在页面内部自行切换（如 `host.ui().openPage(...)` 只能打开本插件自己的页面）。
 - 插件数据写在 `host.dataDir`（`host.files()` 相对路径以它为根），机密凭据写 `host.secrets()`，不要在页面里缓存需要跨进程保留的状态。
 - 页面里做完安装/登录/开关等会影响工具或技能的动作后调用 `host.requestContributionsRefresh()`：宿主重跑一次物化并触发会话重建，贡献在安全点生效。例如插件在页面里装好 CLI 后再返回工具列表，下一次会话就能看到新工具。
-- 页面可以调用 17 个宿主服务；需要独立返回栈或全屏的流程仍由插件自己组织页面层级，不能注册 Activity。
+- 页面可以调用宿主服务；需要独立返回栈或全屏的流程仍由插件自己组织页面层级，不能注册 Activity。
 - `PluginPage.content` 不接收 `SlotState`；需要活跃会话/传递上下文时在页面里调 `host.sessions().active` 或自己保存界面状态。
 - `host.requestContributionsRefresh()` 是异步触发、不等待完成；需要在界面上确认结果时用插件自己的状态标记，不要假设返回时就已物化。
 - `network().get`/`post` 与 `PluginAvailability.isReady` 是扩展函数；显式 import 风格下要分别 import `get`/`post`/`isReady`（或整包 `io.github.whywood.deepdeep.plugin.api.*`）。
@@ -801,6 +801,7 @@ host.chat().sendMessage(call.sessionId, "同步完成", chatMessageOptions(trigg
 - **适用来源**：可信的第一方/个人插件包；第三方工具源用 MCP，不走 `.ddp`。
 - **完整性**：安装记录钉死整包 sha256，每次装载前复核；canonical digest 验签防篡改；更新必须同 `keyId`；失败保留上一可用版本。
 - **宿主不暴露的东西**：Provider 凭据/OAuth、ADB 配对流程、宿主内部加密密钥、pi SDK 内部类型。插件拿到的是 `PluginHost` 契约与 `host.context`。
+- **原生网络**：HTTP 用 `host.network()`；非常规协议（IMAP/SMTP、WebSocket 等）可用 JVM 标准库直连，须在清单声明 `network`，保留 TLS 证书校验，并遵守系统明文 HTTP 策略；不要在页面或工具里阻塞主线程。
 - **插件作者的义务**：不读与本插件无关的用户数据；不把凭据写日志；删除/覆盖用户数据的动作要可逆或在页面里明确确认；不要用 `System.exit`/`Runtime.halt` 结束进程。
 - **崩溃**：工具/回调异常会被宿主隔离成 error/失败记录；但插件在主线程、Compose 槽或工具执行中把进程搞崩仍会带崩 App（没有进程级隔离，也没有槽位崩溃标记兜底）。
 
