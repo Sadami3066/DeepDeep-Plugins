@@ -1,0 +1,35 @@
+{
+  "id": "io.github.whywood.deepdeep.pluginsample",
+  "version": "1.0.0",
+  "apiLevel": 5,
+  "minHostVersion": "1.0.1",
+  "capabilities": [],
+  "entryClass": "io.github.whywood.deepdeep.pluginsample.SamplePlugin",
+  "name": {
+    "default": "Plugin Sample",
+    "zh": "示例插件",
+    "en": "Plugin Sample"
+  },
+  "summary": {
+    "default": "Host e2e fixture: one echo tool and one page.",
+    "zh": "宿主 e2e 夹具：一个回声工具与一个页面。",
+    "en": "Host e2e fixture: one echo tool and one page."
+  },
+  "description": {
+    "default": "Used by the DeepDeep host repository end-to-end scripts to verify external plugin install, activate, disable, upgrade and uninstall on a device.",
+    "zh": "供 DeepDeep 宿主仓库的端到端脚本在设备上验证外部插件的安装、启用、停用、升级与卸载。",
+    "en": "Used by the DeepDeep host repository end-to-end scripts to verify external plugin install, activate, disable, upgrade and uninstall on a device."
+  },
+  "homepage": "https://github.com/Sadami3066/DeepDeep-Plugins",
+  "icon": "asset:icon.png",
+  "publisher": {
+    "name": "DeepDeep dev"
+  },
+  "provides": {
+    "tools": ["sample_echo"],
+    "skills": [],
+    "uiSlots": [],
+    "pages": ["sample.main"]
+  },
+  "defaultEnabled": true
+}
