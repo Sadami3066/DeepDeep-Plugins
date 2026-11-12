@@ -2,7 +2,7 @@
   "id": "io.github.whywood.deepdeep.plugintemplate",
   "version": "1.0.0",
   "apiLevel": 5,
-  "minHostVersion": "0.2.0",
+  "minHostVersion": "1.0.1",
   "capabilities": [],
   "entryClass": "io.github.whywood.deepdeep.plugintemplate.TemplatePlugin",
   "name": {

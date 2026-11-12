@@ -8,7 +8,7 @@ DeepDeep 插件是 **Kotlin 代码插件**：实现 `plugin-api` 的 `DeepDeepPl
 
 ## 快速开始
 
-`plugin-api` 是唯一契约工件（Android library，包名 `io.github.whywood.deepdeep.plugin.api`）：当前 SDK 版本 `0.8.0`、`PLUGIN_API_LEVEL = 5`、`BASELINE_API_LEVEL = 5`、`HOST_UI_API_LEVEL = 1`。
+`plugin-api` 是唯一契约工件（Android library，包名 `io.github.whywood.deepdeep.plugin.api`）：当前 SDK 版本 `0.8.1`、`PLUGIN_API_LEVEL = 5`、`BASELINE_API_LEVEL = 5`、`HOST_UI_API_LEVEL = 1`。
 
 本仓库自带 `template/`：独立的 Gradle Android 工程，包含一个示例工具、一个示例技能、一段提示词与完整的 `.ddp` 打包/签名实现，复制即可作为插件起点。
 
@@ -61,7 +61,7 @@ cp -R template my-plugin && cd my-plugin
 
 依赖规则：
 
-- 宿主已提供的库只能 `compileOnly`：`io.github.whywood.deepdeep:plugin-api:0.8.0`（`api()` 传递 `io.github.whywood.deepdeep:design:0.6.0`，插件 UI 直接用其中的 Dd 组件）、Compose（`ui`/`foundation`/`material3` + BOM）、`kotlinx-coroutines-core`、`kotlinx-serialization-json`。
+- 宿主已提供的库只能 `compileOnly`：`io.github.whywood.deepdeep:plugin-api:0.8.1`（`api()` 传递 `io.github.whywood.deepdeep:design:0.6.1`，插件 UI 直接用其中的 Dd 组件）、Compose（`ui`/`foundation`/`material3` + BOM）、`kotlinx-coroutines-core`、`kotlinx-serialization-json`。
 - **禁止** `implementation` 这些库：宿主 parent-first，`plugin-api` 与 Compose 只存在宿主那一份，插件包里重复打包会触发类冲突。
 - 插件可以带自己的第三方库，但必须一起打进 `classes*.dex`，并避开宿主已占用的包/类名。
 - 只暴露 `plugin-api`；不要反射 App 内部实现（升级会坏）。
@@ -77,7 +77,7 @@ cp -R template my-plugin && cd my-plugin
 | `id` | string | 是 | 反向域名小写，至少两段，正则 `^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)+$`（如 `com.example.myplugin`）；宿主用它做安装目录与唯一标识 |
 | `version` | string | 是 | `major.minor.patch`，可带 `-dev`/`+build` 后缀；宿主记录安装版本、判断更新 |
 | `apiLevel` | int | 否（默认 5） | 插件要求的契约等级；必须在 `MIN_SUPPORTED_API_LEVEL..PLUGIN_API_LEVEL`（当前 5..5）内，否则拒绝装载。不写时按 `BASELINE_API_LEVEL`（5）处理 |
-| `minHostVersion` | string | 否 | 最低宿主版本。宿主版本取 `BuildConfig.VERSION_NAME`（当前 `1.0.2`）；比较只看 `major.minor.patch`、忽略后缀，所以 `1.0.2` 宿主满足 `minHostVersion: "0.2.0"` |
+| `minHostVersion` | string | 否 | 最低宿主版本。宿主版本取 `BuildConfig.VERSION_NAME`（当前 `1.0.2`）；比较只看 `major.minor.patch`、忽略后缀，所以 `1.0.2` 宿主满足 `minHostVersion: "1.0.1"` |
 | `entryClass` | string | 是 | 实现 `DeepDeepPlugin` 的类全名，必须有无参构造 |
 | `name` | LocalizedText | 是 | 插件名，至少含 `default` |
 | `summary` | LocalizedText | 是 | 一句话简介，至少含 `default` |
@@ -257,7 +257,7 @@ sha256 对条目的**未压缩内容**计算，行与行直接拼接、最后一
       "id": "com.example.myplugin",
       "version": "1.0.1",
       "apiLevel": 5,
-      "minHostVersion": "0.2.0",
+      "minHostVersion": "1.0.1",
       "url": "https://example.com/plugins/my-plugin-1.0.1.ddp",
       "sha256": "<.ddp 整包 sha256>",
       "size": 123456,
@@ -715,8 +715,8 @@ host.chat().sendMessage(call.sessionId, "同步完成", ChatMessageOptions(trigg
 ## ABI 与版本
 
 - `PLUGIN_API_LEVEL = 5`：宿主加载时要求 `plugin.apiLevel` 在 `MIN_SUPPORTED_API_LEVEL..5` 内；未写 `apiLevel` 按 `BASELINE_API_LEVEL = 5`。
-- `minHostVersion` 用 `PluginVersion.compareCore` 比较，只看 `major.minor.patch`、忽略后缀（`0.2.0-dev` 视为 `0.2.0`），避免开发版被自己的门槛卡住；完整 semver 比较按「release > prerelease、build 忽略」处理。宿主版本号来自 App 的 `BuildConfig.VERSION_NAME`（当前 `1.0.2`），所以 `minHostVersion: "0.2.0"` 在当前宿主上通过。
-- **发布前没有兼容承诺**：当前处于发布前开发期，`plugin-api` 可以随时删改类型/签名且不升级 `PLUGIN_API_LEVEL`，插件必须按最新 SDK 重新编译；发布后才启用「同一 apiLevel 内只做加法、删改变必须升等级」的规则。SDK 版本号（当前 `0.8.0`）与 `PLUGIN_API_LEVEL` 独立维护。
+- `minHostVersion` 用 `PluginVersion.compareCore` 比较，只看 `major.minor.patch`、忽略后缀（`1.0.1-dev` 视为 `1.0.1`），避免开发版被自己的门槛卡住；完整 semver 比较按「release > prerelease、build 忽略」处理。宿主版本号来自 App 的 `BuildConfig.VERSION_NAME`（当前 `1.0.2`），所以 `minHostVersion: "1.0.1"` 在当前宿主上通过。
+- **发布前没有兼容承诺**：当前处于发布前开发期，`plugin-api` 可以随时删改类型/签名且不升级 `PLUGIN_API_LEVEL`，插件必须按最新 SDK 重新编译；发布后才启用「同一 apiLevel 内只做加法、删改变必须升等级」的规则。SDK 版本号（当前 `0.8.1`）与 `PLUGIN_API_LEVEL` 独立维护。
 - `plugin-api` 的公开 ABI 由宿主维护者的 ABI 基线清单固定，删改公开类型/签名必须显式更新清单并升版本。
 - 插件必须 `compileOnly` 依赖宿主库；宿主 parent-first 保证 `plugin-api` 与 Compose 只存在宿主那一份。
 - Compose 没有跨版本二进制 ABI 承诺：插件要按宿主 Kotlin/Compose 版本重新编译；版本不一致只禁用该插件的 UI，不拒绝插件。
@@ -773,6 +773,6 @@ host.chat().sendMessage(call.sessionId, "同步完成", ChatMessageOptions(trigg
 
 ## 参考
 
-- 契约工件：`io.github.sadami3066.deepdeep:plugin-api:0.8.0`（公开 Maven `https://sadami3066.github.io/deepdeep-maven`）
+- 契约工件：`io.github.sadami3066.deepdeep:plugin-api:0.8.1`（公开 Maven `https://sadami3066.github.io/deepdeep-maven`）
 - 示例工程与打包签名实现：[template/](template/README.md)
 - 插件仓库说明：[README.md](README.md)；上架与分发规则：[MARKET_POLICY.md](MARKET_POLICY.md)

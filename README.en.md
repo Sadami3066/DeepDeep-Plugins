@@ -17,6 +17,7 @@ This repository is for external plugin authors: start from `template/`, develop 
 | Path | Description |
 |---|---|
 | [`template/`](template/) | Standalone Gradle Android plugin template: example tool, skill and prompt section, plus the full build, signing and verification tasks |
+| [`sample/`](sample/) | Test fixture for the host end-to-end scripts: one echo tool and one page; not a plugin for the market |
 | [`docs/PLUGIN_DEV.md`](docs/PLUGIN_DEV.md) | Plugin development guide: host contract, `plugin.json` manifest, `.ddp` package format, signing and verification, install/update, lifecycle, extension points and security model |
 | [`MARKET_POLICY.md`](MARKET_POLICY.md) | Marketplace policy: accepted content, prohibited content, submission requirements, signing and takedown rules |
 | [`PR_REVIEW.md`](PR_REVIEW.md) | Marketplace review checklist |
@@ -51,7 +52,7 @@ dependencyResolutionManagement {
 
 ```kotlin
 dependencies {
-    compileOnly("io.github.sadami3066.deepdeep:plugin-api:0.8.0")
+    compileOnly("io.github.sadami3066.deepdeep:plugin-api:0.8.1")
 }
 ```
 
@@ -130,7 +131,7 @@ Transfer the `.ddp` to the phone, open DeepDeep's plugin page, choose the import
 - **Same process, same permissions**: plugins share the app's process and UID with no sandbox. They can read the app's private data, reflect into host internals, start threads and kill the process. `capabilities` only controls accessor injection, not a permission boundary. The execution identity is determined by the user's access tier (LOCAL/ADB/ROOT); do not assume the plugin always runs as root.
 - **Third-party dependencies and services**: plugins may bundle third-party libraries into the dex and may call networks or third-party services. Their licenses, security and compliance are the responsibility of the plugin author and the user.
 - **Blast radius of crashes**: tool/callback exceptions are isolated by the host, but a crash caused by a plugin on the main thread, in a Compose slot or during tool execution still takes down the app.
-- **No ABI compatibility promise before release**: `plugin-api` is still pre-release (SDK 0.8.0, API level 5); types and signatures may change without raising the API level. Recompile plugins against the latest SDK.
+- **No ABI compatibility promise before release**: `plugin-api` is still pre-release (SDK 0.8.1, API level 5); types and signatures may change without raising the API level. Recompile plugins against the latest SDK.
 - **Review is not a security guarantee**: marketplace review checks submission rules and description consistency; it does not guarantee that a plugin is free of vulnerabilities or malicious behaviour.
 
 ## Licensing

@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-11-12
+
+- feat: 新增 `sample/` 测试夹具（`sample_echo` 工具 + `sample.main` 页面，随仓库提交仅用于开发的 Ed25519 签名密钥），供宿主仓库 `scripts/plugin-e2e.sh` 在设备上回归外部插件的安装、启用、停用、升级与卸载 [工具] [模板]
+- chore: 模板升到 `plugin-api:0.8.1`（消费端 R8 keep 规则补齐），模板清单 `minHostVersion` 改为 `1.0.1`；README 与开发文档的版本表同步 [依赖] [文档]
+
 ## 2026-11-10
 
 - feat(api): 插件 API 升到 v2（`PLUGIN_API_LEVEL` / `BASELINE_API_LEVEL` 4→5）；删除 `host.privilege()` / `PrivilegeService` 与清单字段 `requiresPrivilege`；`host.linux()` / `host.files()` 语义不变，执行身份由用户选择的访问档位（LOCAL/ADB/ROOT）决定 [api] [破坏性]

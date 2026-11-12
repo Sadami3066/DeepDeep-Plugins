@@ -17,6 +17,7 @@ DeepDeep 是运行在 Android 上的个人智能体。插件用 Kotlin 编写，
 | 路径 | 说明 |
 |---|---|
 | [`template/`](template/) | 独立 Gradle Android 插件模板：示例工具、技能、提示词段，以及完整的打包、签名、校验任务 |
+| [`sample/`](sample/) | 宿主端到端回归用的测试夹具：一个回声工具与一个页面，不是可上架插件 |
 | [`docs/PLUGIN_DEV.md`](docs/PLUGIN_DEV.md) | 插件开发文档：宿主契约、`plugin.json` 清单、`.ddp` 包格式、签名与验签、安装更新、生命周期、扩展面与安全模型 |
 | [`MARKET_POLICY.md`](MARKET_POLICY.md) | 市场上架政策：可上架内容、禁止内容、提交要求、签名与下架规则 |
 | [`PR_REVIEW.md`](PR_REVIEW.md) | 上架审核清单 |
@@ -51,7 +52,7 @@ dependencyResolutionManagement {
 
 ```kotlin
 dependencies {
-    compileOnly("io.github.sadami3066.deepdeep:plugin-api:0.8.0")
+    compileOnly("io.github.sadami3066.deepdeep:plugin-api:0.8.1")
 }
 ```
 
@@ -130,7 +131,7 @@ cd my-plugin
 - **同进程、同权限**：插件与 App 同进程、同 UID、无沙箱，能读写 App 私有数据、反射宿主内部类、起线程、结束进程。`capabilities` 只控制访问器注入，不是权限边界。执行身份由用户选择的访问档位（LOCAL/ADB/ROOT）决定，不要假设永远以 root 运行。
 - **第三方依赖与服务**：插件可自带第三方库打进 dex，也可访问网络与第三方服务；这些代码与服务的许可证、安全与合规由插件作者和用户承担。
 - **崩溃影响范围**：插件的工具/回调异常会被宿主隔离，但插件在主线程、Compose 槽位或工具执行中导致进程崩溃时，仍会带崩 App。
-- **发布前无 ABI 兼容承诺**：`plugin-api` 当前处于发布前开发期（SDK 0.8.0、API level 5），类型与签名可能直接删改而不升 API level；请按最新 SDK 重新编译插件。
+- **发布前无 ABI 兼容承诺**：`plugin-api` 当前处于发布前开发期（SDK 0.8.1、API level 5），类型与签名可能直接删改而不升 API level；请按最新 SDK 重新编译插件。
 - **审核不是安全担保**：市场人工审核只核对上架规则与描述一致性，不保证插件无漏洞、无恶意行为。
 
 ## 权益与许可
