@@ -44,7 +44,8 @@ class TemplatePlugin : DeepDeepPlugin {
         ),
     )
 
-    override fun contributions(host: PluginHost): Contributions = contributions(tools = listOf(echoTool))
+    override fun contributions(host: PluginHost): Contributions =
+        contributions(tools = listOf(echoTool, stateTool(host)))
 
     private fun skillMarkdown(host: PluginHost): String {
         val fromAssets = runCatching {
@@ -76,9 +77,47 @@ class TemplatePlugin : DeepDeepPlugin {
         textResult("template_echo: $message")
     }
 
+    private fun stateTool(host: PluginHost) = pluginTool(
+        name = "template_state",
+        label = "template_state",
+        description = "Read or write a value in the host settings store and report the device model. Demonstrates host.settings() and host.device().",
+        parameters = buildJsonObject {
+            put("type", "object")
+            putJsonObject("properties") {
+                putJsonObject("action") {
+                    put("type", "string")
+                    put("description", "get or set")
+                }
+                putJsonObject("value") {
+                    put("type", "string")
+                    put("description", "Value stored when action is set.")
+                }
+            }
+            putJsonArray("required") {
+                add(JsonPrimitive("action"))
+            }
+        },
+    ) { call ->
+        when (val action = call.args["action"]?.jsonPrimitive?.content.orEmpty()) {
+            "set" -> {
+                val value = call.args["value"]?.jsonPrimitive?.content.orEmpty()
+                host.settings().put(STATE_KEY, value)
+                textResult("stored: $value (${host.device().info.model})")
+            }
+
+            "get" -> {
+                val value = host.settings().get(STATE_KEY)
+                textResult(value?.let { "value: $it" } ?: "value: none")
+            }
+
+            else -> textResult("action must be get or set", isError = true)
+        }
+    }
+
     private companion object {
         const val SKILL_ID = "template-skill"
         const val SKILL_ASSET_DIR = "skills/template-skill"
         const val PROMPT_SECTION_ID = "template-plugin"
+        const val STATE_KEY = "template_state"
     }
 }

@@ -30,7 +30,8 @@ import kotlinx.serialization.json.putJsonObject
 class SamplePlugin : DeepDeepPlugin {
     override suspend fun availability(host: PluginHost): PluginAvailability = available()
 
-    override fun contributions(host: PluginHost): Contributions = contributions(tools = listOf(echoTool))
+    override fun contributions(host: PluginHost): Contributions =
+        contributions(tools = listOf(echoTool, stateTool(host)))
 
     override fun ui(host: PluginHost): PluginUiContributions = object : PluginUiContributions {
         override val bindings: List<SlotBinding> = emptyList()
@@ -69,9 +70,47 @@ class SamplePlugin : DeepDeepPlugin {
         textResult("echo: $text")
     }
 
+    private fun stateTool(host: PluginHost) = pluginTool(
+        name = "sample_state",
+        label = "sample_state",
+        description = "Read or write a value in the host settings store. Demonstrates host.settings().",
+        parameters = buildJsonObject {
+            put("type", "object")
+            putJsonObject("properties") {
+                putJsonObject("action") {
+                    put("type", "string")
+                    put("description", "get or set")
+                }
+                putJsonObject("value") {
+                    put("type", "string")
+                    put("description", "Value stored when action is set.")
+                }
+            }
+            putJsonArray("required") {
+                add(JsonPrimitive("action"))
+            }
+        },
+    ) { call ->
+        when (val action = call.args["action"]?.jsonPrimitive?.contentOrNull.orEmpty()) {
+            "set" -> {
+                val value = call.args["value"]?.jsonPrimitive?.contentOrNull.orEmpty()
+                host.settings().put(STATE_KEY, value)
+                textResult("stored: $value")
+            }
+
+            "get" -> {
+                val value = host.settings().get(STATE_KEY)
+                textResult(value?.let { "value: $it" } ?: "value: none")
+            }
+
+            else -> textResult("action must be get or set", isError = true)
+        }
+    }
+
     private companion object {
         const val PAGE_ID = "sample.main"
         const val ICON_ASSET = "icon.png"
+        const val STATE_KEY = "sample_state"
     }
 }
 

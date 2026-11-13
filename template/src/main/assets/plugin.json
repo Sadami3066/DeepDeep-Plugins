@@ -2,11 +2,11 @@
   "id": "io.github.whywood.deepdeep.plugintemplate",
   "version": "1.0.0",
   "apiLevel": 6,
-  "minHostVersion": "1.0.4",
+  "minHostVersion": "1.0.6",
   "ui": {
     "apiLevel": 2
   },
-  "capabilities": [],
+  "capabilities": ["settings", "device"],
   "entryClass": "io.github.whywood.deepdeep.plugintemplate.TemplatePlugin",
   "name": {
     "default": "Plugin Template",
@@ -29,7 +29,7 @@
     "name": "Your Name"
   },
   "provides": {
-    "tools": ["template_echo"],
+    "tools": ["template_echo", "template_state"],
     "skills": ["template-skill"],
     "uiSlots": [],
     "pages": []

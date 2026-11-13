@@ -2,11 +2,11 @@
   "id": "io.github.whywood.deepdeep.pluginsample",
   "version": "1.0.0",
   "apiLevel": 6,
-  "minHostVersion": "1.0.4",
+  "minHostVersion": "1.0.6",
   "ui": {
     "apiLevel": 2
   },
-  "capabilities": [],
+  "capabilities": ["settings"],
   "entryClass": "io.github.whywood.deepdeep.pluginsample.SamplePlugin",
   "name": {
     "default": "Plugin Sample",
@@ -29,7 +29,7 @@
     "name": "DeepDeep dev"
   },
   "provides": {
-    "tools": ["sample_echo"],
+    "tools": ["sample_echo", "sample_state"],
     "skills": [],
     "uiSlots": [],
     "pages": ["sample.main"]
