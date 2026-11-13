@@ -32,7 +32,7 @@ This repository is for external plugin authors: start from `template/`, develop 
 - Android SDK: compileSdk 36, minSdk 29; point to it with `ANDROID_HOME` / `ANDROID_SDK_ROOT` or `sdk.dir` in `local.properties`
 - Gradle 9.8.2 (wrapper included in the template)
 - Network access to the public Maven repository `https://sadami3066.github.io/deepdeep-maven` (already configured in the template; no local publishing needed)
-- Host DeepDeep 1.0.6+ when using the new capabilities of `plugin-api 1.1.0`; plugins that only use 1.0.x capabilities run on 1.0.4+
+- Host DeepDeep 1.0.8+ when using the new capabilities of `plugin-api 1.2.0`; plugins that only use 1.0.x/1.1.x capabilities run on 1.0.4+
 
 The host contract `plugin-api` and the `design` UI system come from that public Maven repository; `design` is exposed transitively through `api()`:
 
@@ -53,11 +53,11 @@ dependencyResolutionManagement {
 
 ```kotlin
 dependencies {
-    compileOnly("io.github.sadami3066.deepdeep:plugin-api:1.1.0")
+    compileOnly("io.github.sadami3066.deepdeep:plugin-api:1.2.0")
 }
 ```
 
-The current release is `plugin-api 1.1.0` / `design 0.7.0`: 1.1.0 is a pure addition within API level 6, so published plugins do not need recompiling. Plugins that use the new capabilities set `minHostVersion: "1.0.6"` in the manifest.
+The current release is `plugin-api 1.2.0` / `design 0.9.0`: 1.2.0 is a pure addition within API level 6, so published plugins do not need recompiling. Plugins that use the new capabilities set `minHostVersion: "1.0.8"` in the manifest.
 
 ### 1. Copy the template and rename it
 
@@ -135,7 +135,7 @@ Transfer the `.ddp` to the phone, open DeepDeep's plugin page, choose the import
 - **Same process, same permissions**: plugins share the app's process and UID with no sandbox. They can read the app's private data, reflect into host internals, start threads and kill the process. `capabilities`, `permissions` and `components` are declarations and gates, not a permission boundary. The execution identity is determined by the user's access tier (LOCAL/ADB/ROOT); do not assume the plugin always runs as root.
 - **Third-party dependencies and services**: plugins may bundle third-party libraries into the dex and may call networks or third-party services. Their licenses, security and compliance are the responsibility of the plugin author and the user.
 - **Blast radius of crashes**: tool/callback exceptions are isolated by the host, but a crash caused by a plugin on the main thread, in a Compose slot or during tool execution still takes down the app.
-- **Compatibility promise**: since `plugin-api 1.0.0 / API level 6`, changes within the same apiLevel are binary-compatible additions only, so published plugins keep working across host upgrades. 1.1.0 is an addition within level 6 and requires host 1.0.6+ for its new capabilities; breaking changes must raise the apiLevel. See `plugin-api/COMPATIBILITY.md` in the host repository.
+- **Compatibility promise**: since `plugin-api 1.0.0 / API level 6`, changes within the same apiLevel are binary-compatible additions only, so published plugins keep working across host upgrades. 1.2.0 is an addition within level 6 and requires host 1.0.8+ for its new capabilities; breaking changes must raise the apiLevel. See `plugin-api/COMPATIBILITY.md` in the host repository.
 - **Review is not a security guarantee**: marketplace review checks submission rules and description consistency; it does not guarantee that a plugin is free of vulnerabilities or malicious behaviour.
 
 ## Licensing

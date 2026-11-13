@@ -32,7 +32,7 @@ DeepDeep 是运行在 Android 上的个人智能体。插件用 Kotlin 编写，
 - Android SDK：compileSdk 36、minSdk 29；SDK 位置通过 `ANDROID_HOME` / `ANDROID_SDK_ROOT` 或 `local.properties` 的 `sdk.dir` 指定
 - Gradle 9.8.2（模板自带 wrapper）
 - 能访问公开 Maven 仓库 `https://sadami3066.github.io/deepdeep-maven`（模板已配置，无需本地发布）
-- 宿主 DeepDeep 1.0.6+（使用 `plugin-api 1.1.0` 新能力时；只用 1.0.x 能力的插件在 1.0.4+ 运行）
+- 宿主 DeepDeep 1.0.8+（使用 `plugin-api 1.2.0` 新能力时；只用 1.0.x/1.1.x 能力的插件在 1.0.4+ 运行）
 
 宿主契约 `plugin-api` 与 UI 设计系统 `design` 由该公开 Maven 仓库提供；`design` 由 `plugin-api` 通过 `api()` 传递：
 
@@ -53,11 +53,11 @@ dependencyResolutionManagement {
 
 ```kotlin
 dependencies {
-    compileOnly("io.github.sadami3066.deepdeep:plugin-api:1.1.0")
+    compileOnly("io.github.sadami3066.deepdeep:plugin-api:1.2.0")
 }
 ```
 
-当前最新为 `plugin-api 1.1.0` / `design 0.7.0`：1.1.0 是 level 6 内的纯加法，已发布插件不需要重新编译；使用新能力的插件在清单里写 `minHostVersion: "1.0.6"`。
+当前最新为 `plugin-api 1.2.0` / `design 0.9.0`：1.2.0 是 level 6 内的纯加法，已发布插件不需要重新编译；使用新能力的插件在清单里写 `minHostVersion: "1.0.8"`。
 
 ### 1. 复制模板并改名
 
@@ -135,7 +135,7 @@ cd my-plugin
 - **同进程、同权限**：插件与 App 同进程、同 UID、无沙箱，能读写 App 私有数据、反射宿主内部类、起线程、结束进程。`capabilities`、`permissions`、`components` 都只用于声明与门禁，不是权限边界。执行身份由用户选择的访问档位（LOCAL/ADB/ROOT）决定，不要假设永远以 root 运行。
 - **第三方依赖与服务**：插件可自带第三方库打进 dex，也可访问网络与第三方服务；这些代码与服务的许可证、安全与合规由插件作者和用户承担。
 - **崩溃影响范围**：插件的工具/回调异常会被宿主隔离，但插件在主线程、Compose 槽位或工具执行中导致进程崩溃时，仍会带崩 App。
-- **兼容承诺**：自 `plugin-api 1.0.0 / API level 6` 起，同一 apiLevel 内只做二进制兼容的加法，已发布插件不会因宿主升级而失效；1.1.0 是 level 6 内的加法，需要宿主 1.0.6+ 才能使用新能力。破坏性改动必须升 apiLevel，详见宿主仓库 `plugin-api/COMPATIBILITY.md`。
+- **兼容承诺**：自 `plugin-api 1.0.0 / API level 6` 起，同一 apiLevel 内只做二进制兼容的加法，已发布插件不会因宿主升级而失效；1.2.0 是 level 6 内的加法，需要宿主 1.0.8+ 才能使用新能力。破坏性改动必须升 apiLevel，详见宿主仓库 `plugin-api/COMPATIBILITY.md`。
 - **审核不是安全担保**：市场人工审核只核对上架规则与描述一致性，不保证插件无漏洞、无恶意行为。
 
 ## 权益与许可
