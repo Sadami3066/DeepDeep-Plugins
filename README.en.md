@@ -6,9 +6,9 @@
 
 ## Overview
 
-DeepDeep is a personal AI agent on Android. Plugins are written in Kotlin, implement `DeepDeepPlugin` from `plugin-api`, and ship as signed `.ddp` bundles that the app loads in its own process. A plugin can contribute tools, skills, prompt sections and Compose UI pages.
+DeepDeep is a personal AI agent on Android. Plugins are written in Kotlin, implement `DeepDeepPlugin` from `plugin-api`, and ship as signed `.ddp` bundles that the app loads in its own process. A plugin can contribute tools, skills, prompt sections and Compose UI pages, and can declare host service capabilities (device, permissions, app management, background tasks, notification listening, accessibility, sharing and deep links — 38 capabilities in total).
 
-This repository is for external plugin authors: start from `template/`, develop against [`docs/PLUGIN_DEV.md`](docs/PLUGIN_DEV.md), and publish through deepdeep-market following [`MARKET_POLICY.md`](MARKET_POLICY.md) and [`PR_REVIEW.md`](PR_REVIEW.md). Official plugins (Feishu, WeCom, SYSU CLI, Mi Cloud) live in [DeepDeep-Official-Plugins](https://github.com/Sadami3066/DeepDeep-Official-Plugins) and serve as complete reference implementations.
+This repository is for external plugin authors: start from `template/`, develop against [`docs/PLUGIN_DEV.md`](docs/PLUGIN_DEV.md), and publish through deepdeep-market following [`MARKET_POLICY.md`](MARKET_POLICY.md) and [`PR_REVIEW.md`](PR_REVIEW.md). Official plugins (Feishu, WeCom, SYSU CLI, Mi Cloud, WeChat Export) live in [DeepDeep-Official-Plugins](https://github.com/Sadami3066/DeepDeep-Official-Plugins) and serve as complete reference implementations.
 
 > Plugins run in the same process and with the same permissions as the app. There is no sandbox, and installing a plugin means trusting it. Only install plugins you trust; use MCP for third-party tool sources.
 
@@ -32,6 +32,7 @@ This repository is for external plugin authors: start from `template/`, develop 
 - Android SDK: compileSdk 36, minSdk 29; point to it with `ANDROID_HOME` / `ANDROID_SDK_ROOT` or `sdk.dir` in `local.properties`
 - Gradle 9.8.2 (wrapper included in the template)
 - Network access to the public Maven repository `https://sadami3066.github.io/deepdeep-maven` (already configured in the template; no local publishing needed)
+- Host DeepDeep 1.0.6+ when using the new capabilities of `plugin-api 1.1.0`; plugins that only use 1.0.x capabilities run on 1.0.4+
 
 The host contract `plugin-api` and the `design` UI system come from that public Maven repository; `design` is exposed transitively through `api()`:
 
@@ -52,9 +53,11 @@ dependencyResolutionManagement {
 
 ```kotlin
 dependencies {
-    compileOnly("io.github.sadami3066.deepdeep:plugin-api:1.0.1")
+    compileOnly("io.github.sadami3066.deepdeep:plugin-api:1.1.0")
 }
 ```
+
+The current release is `plugin-api 1.1.0` / `design 0.7.0`: 1.1.0 is a pure addition within API level 6, so published plugins do not need recompiling. Plugins that use the new capabilities set `minHostVersion: "1.0.6"` in the manifest.
 
 ### 1. Copy the template and rename it
 
@@ -83,6 +86,7 @@ This creates `keys/plugin-signing.pem` and `.pub` (private key mode 600). `keys/
 The entry class implements `DeepDeepPlugin` and can override `availability()`, `onEnable()` / `onDisable()` / `onUpgrade()`, `skills()`, `promptSections()` and `contributions()`. The template already includes:
 
 - a tool, `template_echo` (returned from `contributions()`)
+- a tool, `template_state`, demonstrating `host.settings()` and `host.device()` (the manifest already declares the `settings` and `device` capabilities)
 - a skill, `template-skill` (read from `assets/skills/template-skill/`, with `references/format.md`)
 - a prompt section (from `promptSections()`)
 
@@ -102,7 +106,7 @@ See [`docs/PLUGIN_DEV.md`](docs/PLUGIN_DEV.md) for the full set of extension poi
 
 ### 5. Install on a phone
 
-Transfer the `.ddp` to the phone, open DeepDeep's plugin page, choose the import action and select the file. The confirmation page shows the name, version, size, bundle sha256, publisher name and `keyId`, and declared capabilities. After the first import the host records trust on first use (TOFU) and enables the plugin. Future updates must be signed with the same private key, otherwise they are rejected as a publisher mismatch.
+Transfer the `.ddp` to the phone, open DeepDeep's plugin page, choose the import action and select the file. The confirmation page shows the name, version, size, bundle sha256, publisher name and `keyId`, plus declared capabilities, permissions and components. After the first import the host records trust on first use (TOFU) and enables the plugin. Future updates must be signed with the same private key, otherwise they are rejected as a publisher mismatch.
 
 ### 6. Publish
 
@@ -115,7 +119,7 @@ Transfer the `.ddp` to the phone, open DeepDeep's plugin page, choose the import
 
 - Copy `template/` into its own project and start there. When several plugins share one Gradle project, follow the official repository's `settings.gradle.kts` and root `gradle/plugin-bundle.gradle.kts`.
 - Libraries provided by the host must be `compileOnly`: `plugin-api`, the transitive `design`, Compose (BOM/UI/foundation/material3), `kotlinx-coroutines` and `kotlinx-serialization-json`. Do not use `implementation` for host libraries, or host classes will be bundled into your plugin.
-- Declare the host services you need in `plugin.json` under `capabilities` (e.g. `linux`, `files`, `network`, `sessions`, `mcp`). `capabilities` is required; write an empty array if you need none.
+- Declare the host services you need in `plugin.json` under `capabilities` (e.g. `linux`, `files`, `network`, `settings`, `device`, `packages`, `background`, `notifications`, `location`, `contacts`, `sms`, `calendar`, `media`, `web` — 38 in total). `capabilities` is required; write an empty array if you need none. Runtime permissions go under `permissions`; system components such as notification listening, accessibility, sharing, deep links and background tasks go under `components`, always paired with their capability.
 - Skills, icons and copy live under `assets/`. Plugins cannot use `res/` resources and cannot load native libraries.
 
 ### For users
@@ -128,10 +132,10 @@ Transfer the `.ddp` to the phone, open DeepDeep's plugin page, choose the import
 
 - **Losing the signing key means no more updates**: there is no key recovery. You would have to switch keys and republish as a new publisher, and existing users will not automatically upgrade to builds signed with the new key. Back up the private key offline.
 - **Publisher identity is the `keyId` alone**: `publisher.name` in `plugin.json` is a display name that anyone can set. The real identity is the `keyId` in the signature file. Both the first-install confirmation page and marketplace entries rely on `publisherKeyId`; only install `keyId`s you recognise.
-- **Same process, same permissions**: plugins share the app's process and UID with no sandbox. They can read the app's private data, reflect into host internals, start threads and kill the process. `capabilities` only controls accessor injection, not a permission boundary. The execution identity is determined by the user's access tier (LOCAL/ADB/ROOT); do not assume the plugin always runs as root.
+- **Same process, same permissions**: plugins share the app's process and UID with no sandbox. They can read the app's private data, reflect into host internals, start threads and kill the process. `capabilities`, `permissions` and `components` are declarations and gates, not a permission boundary. The execution identity is determined by the user's access tier (LOCAL/ADB/ROOT); do not assume the plugin always runs as root.
 - **Third-party dependencies and services**: plugins may bundle third-party libraries into the dex and may call networks or third-party services. Their licenses, security and compliance are the responsibility of the plugin author and the user.
 - **Blast radius of crashes**: tool/callback exceptions are isolated by the host, but a crash caused by a plugin on the main thread, in a Compose slot or during tool execution still takes down the app.
-- **No ABI compatibility promise before release**: `plugin-api` is still pre-release (SDK 1.0.x, API level 6); types and signatures may change without raising the API level. Recompile plugins against the latest SDK.
+- **Compatibility promise**: since `plugin-api 1.0.0 / API level 6`, changes within the same apiLevel are binary-compatible additions only, so published plugins keep working across host upgrades. 1.1.0 is an addition within level 6 and requires host 1.0.6+ for its new capabilities; breaking changes must raise the apiLevel. See `plugin-api/COMPATIBILITY.md` in the host repository.
 - **Review is not a security guarantee**: marketplace review checks submission rules and description consistency; it does not guarantee that a plugin is free of vulnerabilities or malicious behaviour.
 
 ## Licensing

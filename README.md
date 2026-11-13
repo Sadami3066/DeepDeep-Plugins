@@ -6,9 +6,9 @@
 
 ## 概览
 
-DeepDeep 是运行在 Android 上的个人智能体。插件用 Kotlin 编写，实现 `plugin-api` 的 `DeepDeepPlugin`，打包成签名后的 `.ddp`，由 App 在自身进程内加载；一个插件可以提供工具、技能、提示词段与 Compose UI 页面。
+DeepDeep 是运行在 Android 上的个人智能体。插件用 Kotlin 编写，实现 `plugin-api` 的 `DeepDeepPlugin`，打包成签名后的 `.ddp`，由 App 在自身进程内加载；一个插件可以提供工具、技能、提示词段与 Compose UI 页面，也可以按清单声明使用宿主服务能力（设备、权限、应用管理、后台任务、通知监听、无障碍、分享与深链等，共 38 项 capability）。
 
-本仓库面向外部插件作者：从 `template/` 起步，按 [`docs/PLUGIN_DEV.md`](docs/PLUGIN_DEV.md) 开发，按 [`MARKET_POLICY.md`](MARKET_POLICY.md) 与 [`PR_REVIEW.md`](PR_REVIEW.md) 发布到 DeepDeep 市场。DeepDeep 官方插件（飞书、企业微信、中山大学 CLI、小米云服务）在 [DeepDeep-Official-Plugins](https://github.com/Sadami3066/DeepDeep-Official-Plugins)，可作为完整参考实现。
+本仓库面向外部插件作者：从 `template/` 起步，按 [`docs/PLUGIN_DEV.md`](docs/PLUGIN_DEV.md) 开发，按 [`MARKET_POLICY.md`](MARKET_POLICY.md) 与 [`PR_REVIEW.md`](PR_REVIEW.md) 发布到 DeepDeep 市场。DeepDeep 官方插件（飞书、企业微信、中山大学 CLI、小米云服务、微信导出）在 [DeepDeep-Official-Plugins](https://github.com/Sadami3066/DeepDeep-Official-Plugins)，可作为完整参考实现。
 
 > 插件与 App 同进程、同权限运行，没有沙箱，安装即信任。只安装自己信任的插件；第三方工具源请使用 MCP。
 
@@ -32,6 +32,7 @@ DeepDeep 是运行在 Android 上的个人智能体。插件用 Kotlin 编写，
 - Android SDK：compileSdk 36、minSdk 29；SDK 位置通过 `ANDROID_HOME` / `ANDROID_SDK_ROOT` 或 `local.properties` 的 `sdk.dir` 指定
 - Gradle 9.8.2（模板自带 wrapper）
 - 能访问公开 Maven 仓库 `https://sadami3066.github.io/deepdeep-maven`（模板已配置，无需本地发布）
+- 宿主 DeepDeep 1.0.6+（使用 `plugin-api 1.1.0` 新能力时；只用 1.0.x 能力的插件在 1.0.4+ 运行）
 
 宿主契约 `plugin-api` 与 UI 设计系统 `design` 由该公开 Maven 仓库提供；`design` 由 `plugin-api` 通过 `api()` 传递：
 
@@ -52,9 +53,11 @@ dependencyResolutionManagement {
 
 ```kotlin
 dependencies {
-    compileOnly("io.github.sadami3066.deepdeep:plugin-api:1.0.1")
+    compileOnly("io.github.sadami3066.deepdeep:plugin-api:1.1.0")
 }
 ```
+
+当前最新为 `plugin-api 1.1.0` / `design 0.7.0`：1.1.0 是 level 6 内的纯加法，已发布插件不需要重新编译；使用新能力的插件在清单里写 `minHostVersion: "1.0.6"`。
 
 ### 1. 复制模板并改名
 
@@ -83,6 +86,7 @@ cd my-plugin
 入口类实现 `DeepDeepPlugin`，按需实现 `availability()`、`onEnable()` / `onDisable()` / `onUpgrade()`、`skills()`、`promptSections()` 与 `contributions()`。模板自带：
 
 - 工具 `template_echo`（由 `contributions()` 返回）
+- 工具 `template_state`：演示 `host.settings()` 与 `host.device()`（清单已声明 `settings`、`device` capability）
 - 技能 `template-skill`（从 `assets/skills/template-skill/` 读取 `SKILL.md`，含 `references/format.md`）
 - 一段提示词（`promptSections()`）
 
@@ -102,7 +106,7 @@ cd my-plugin
 
 ### 5. 安装到手机
 
-把 `.ddp` 传到手机，打开 DeepDeep 的插件页，选择「导入插件」并选中文件。确认页会展示名称、版本、体积、整包 sha256、发布者名称与 `keyId`、能力声明；首次导入确认后写入信任记录（TOFU）并启用。之后的更新必须由同一把私钥签名，否则按「发布者不匹配」拒绝。
+把 `.ddp` 传到手机，打开 DeepDeep 的插件页，选择「导入插件」并选中文件。确认页会展示名称、版本、体积、整包 sha256、发布者名称与 `keyId`、能力/权限/组件声明；首次导入确认后写入信任记录（TOFU）并启用。之后的更新必须由同一把私钥签名，否则按「发布者不匹配」拒绝。
 
 ### 6. 发布
 
@@ -115,7 +119,7 @@ cd my-plugin
 
 - 从 `template/` 复制出独立工程即可开始；多个插件放在同一个 Gradle 工程时，参考官方插件仓的 `settings.gradle.kts` 与根 `gradle/plugin-bundle.gradle.kts`。
 - 宿主已提供的库只能 `compileOnly` 依赖：`plugin-api`、经它传递的 `design`、Compose（BOM/UI/foundation/material3）、`kotlinx-coroutines`、`kotlinx-serialization-json`。不要用 `implementation` 引宿主库，否则会把宿主类打进插件包。
-- 需要系统能力时，在 `plugin.json` 的 `capabilities` 中声明（如 `linux`、`files`、`network`、`sessions`、`mcp`）；`capabilities` 必须显式给出，空数组也要写。
+- 需要系统能力时，在 `plugin.json` 的 `capabilities` 中声明（如 `linux`、`files`、`network`、`settings`、`device`、`packages`、`background`、`notifications`、`location`、`contacts`、`sms`、`calendar`、`media`、`web` 等，共 38 项）；`capabilities` 必须显式给出，空数组也要写。运行时权限写 `permissions`，通知监听/无障碍/分享/深链/后台任务等系统组件写 `components`，并与对应 capability 成对声明。
 - 技能、图标与文案都放在 `assets/`；插件不能使用 `res/` 资源，也不能加载原生库。
 
 ### 用户
@@ -128,10 +132,10 @@ cd my-plugin
 
 - **签名私钥丢失 = 无法更新**：私钥没有找回机制，丢失后只能换钥以新发布者身份重新上架，已安装用户不会自动升级到新钥签名的版本。请离线备份私钥。
 - **发布者身份只看 `keyId`**：`plugin.json` 里的 `publisher.name` 只是展示名，可任意填写；真正身份是签名文件里的 `keyId`。首次安装确认页与市场条目都以 `publisherKeyId` 为准，只安装你认识的 `keyId`。
-- **同进程、同权限**：插件与 App 同进程、同 UID、无沙箱，能读写 App 私有数据、反射宿主内部类、起线程、结束进程。`capabilities` 只控制访问器注入，不是权限边界。执行身份由用户选择的访问档位（LOCAL/ADB/ROOT）决定，不要假设永远以 root 运行。
+- **同进程、同权限**：插件与 App 同进程、同 UID、无沙箱，能读写 App 私有数据、反射宿主内部类、起线程、结束进程。`capabilities`、`permissions`、`components` 都只用于声明与门禁，不是权限边界。执行身份由用户选择的访问档位（LOCAL/ADB/ROOT）决定，不要假设永远以 root 运行。
 - **第三方依赖与服务**：插件可自带第三方库打进 dex，也可访问网络与第三方服务；这些代码与服务的许可证、安全与合规由插件作者和用户承担。
 - **崩溃影响范围**：插件的工具/回调异常会被宿主隔离，但插件在主线程、Compose 槽位或工具执行中导致进程崩溃时，仍会带崩 App。
-- **发布前无 ABI 兼容承诺**：`plugin-api` 当前处于发布前开发期（SDK 1.0.x、API level 6），类型与签名可能直接删改而不升 API level；请按最新 SDK 重新编译插件。
+- **兼容承诺**：自 `plugin-api 1.0.0 / API level 6` 起，同一 apiLevel 内只做二进制兼容的加法，已发布插件不会因宿主升级而失效；1.1.0 是 level 6 内的加法，需要宿主 1.0.6+ 才能使用新能力。破坏性改动必须升 apiLevel，详见宿主仓库 `plugin-api/COMPATIBILITY.md`。
 - **审核不是安全担保**：市场人工审核只核对上架规则与描述一致性，不保证插件无漏洞、无恶意行为。
 
 ## 权益与许可
