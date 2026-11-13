@@ -953,6 +953,8 @@ private fun StatusCard(host: PluginHost, status: Status) {
 同一轮升级里所有官方插件按这套骨架收敛，第三方插件也可以照做：
 
 - 页面骨架：横向 20dp、顶部 12dp、**底部 24dp**、组间 16dp；宿主已有 64dp 顶栏，页面内不再重复标题。
+- 卡片内边距：`DdGroupCard` 只画卡片背景，不替自定义内容做横向留白。直接放 `DdStatusRow`、`DdText`、`Row` 等自定义内容时，先包一层 `Column(Modifier.fillMaxWidth().padding(horizontal = DdSpacing.Card))`（18dp），文字不能贴卡片左右边；`DdListRow` 已通过 `LocalDdRowHorizontalPadding` 自带 18dp，不要再套横向 padding；`DdNoticeBar` 自带内边距。页面最外层已有 20dp，卡片内再 18dp 是正常的双层留白，不要省掉。
+
 - 首屏先说状态：用 `DdStatusRow` 组成摘要（运行环境、组件/CLI、账号、登录状态），值写人类可读的「已就绪 / 待更新 / 未连接」，不写版本号、路径、布尔值；刷新保留旧值，只有该行显示 busy。
 - 操作层级：每屏最多一个 `DdPrimaryButton`；次要操作放文字按钮或菜单；退出、删除这类不可逆操作走 `host.ui().confirm(destructive = true)`。
 - 反馈：错误就近用 `DdNoticeBar`（危险色）+「重试」，重试要重跑刚才失败的动作，不要只刷新页面；成功/撤销可用 `snackbar` 或结果卡，不要只用 Toast 报路径。
